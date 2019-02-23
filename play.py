@@ -153,9 +153,10 @@ cool stuff to add:
     play.circle(x=0, y=0, radius=10, border_width=1, border_color='red')
     ellipse
     line
+    collision system (bouncing balls, platformer)
 
     glide to
-    wait 1 second
+    wait 1 second (can use generator to set up nested game loop -- disabling any further calls –– and return control to main loop after wait?)
     ghost effect
     sprite.turn()
     sprite.remove()
@@ -167,6 +168,9 @@ cool stuff to add:
     sprite.point_to()
     bounce
     sprite.is_touching()
+    sprite.physics(mass, shape)
+    @sprite.when_touching
+    @sprite.when_first_touching
     change_image / animation system / costume
     sprite.show/hide/disable
     sprite.change_size
@@ -177,6 +181,8 @@ cool stuff to add:
     play.random_number(from=0, to=100)
 
 
+how to change background color once every half second?
+how to do a series of actions 10 times only? (can't use forever loop. in scratch this would be when (flag) clicked, loop 10 times)
 how to make a text input box simply?
 how to make pong?
 how to make paint app?
