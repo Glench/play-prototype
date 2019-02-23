@@ -168,7 +168,7 @@ cool stuff to add:
     sprite.point_to()
     bounce
     sprite.is_touching()
-    sprite.physics(mass, shape)
+    sprite.physics(mass, shape, velocity_x, velocity_y)
     @sprite.when_touching
     @sprite.when_first_touching
     change_image / animation system / costume
