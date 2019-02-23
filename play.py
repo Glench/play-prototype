@@ -24,6 +24,7 @@ class sprite(object):
         self.image = image
         self.x = x
         self.y = y
+        self.angle = 0
         self.size = size
 
         self._pygame_surface = pygame.image.load(os.path.join(image))
@@ -137,3 +138,50 @@ def forever():
     pygame.display.flip()
     return True
 
+"""
+cool stuff to add:
+    scene class, hide and show scenes in one go (collection of sprites)
+    mouse down
+    mouse move
+    mouse hover
+    mouse hold
+    debug UI for all sprites (bounding box plus values of: x,y,image,size,width,height click state, running commands)
+    key pressed
+    timer(s)
+    particle system
+    play.rectangle(x=0, y=0, width=100, height=200, color='gray', border_color='red', border_width=1)
+    play.circle(x=0, y=0, radius=10, border_width=1, border_color='red')
+    ellipse
+    line
+
+    glide to
+    wait 1 second
+    ghost effect
+    sprite.turn()
+    sprite.remove()
+    dog.go_to(cat.bottom)
+    text.font = 
+    play sound / music
+    change sound volume
+    sprite.clone()
+    sprite.point_to()
+    bounce
+    sprite.is_touching()
+    change_image / animation system / costume
+    sprite.show/hide/disable
+    sprite.change_size
+    background image
+    sprite.distance_to()
+    play.random_position()
+    play.random_color()
+    play.random_number(from=0, to=100)
+
+
+how to make a text input box simply?
+how to make pong?
+how to make paint app?
+how to make click and drag boxes?
+how to make simple jumping box with gravity?
+how to make more advanced platformer?
+
+"""
