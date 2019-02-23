@@ -107,7 +107,7 @@ def _play_x_to_pygame_x(sprite):
 def _play_y_to_pygame_y(sprite):
     return sprite.y + (height/2.) - (sprite._pygame_surface.get_height()/2.)
 
-def forever():
+def repeat_forever():
     click_detected = False
     click_x = None
     click_y = None

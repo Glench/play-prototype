@@ -16,7 +16,15 @@ def do():
 #     cat.turn(5)
 #     label.words = number
 
-while play.forever():
+# maybe this instead
+# for count in play.repeat(5):
+#    ...
+# or
+# while play.repeat(5):
+#    ...
+# queues commands to be run on next frames
+
+while play.repeat_forever():
     # commands you want to happen constantly go here
     cat.move(1)
     label.go_to(cat)
