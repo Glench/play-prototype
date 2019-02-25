@@ -4,6 +4,8 @@ import os
 import pygame
 import OpenGL.GL as gl
 
+import asyncio
+
 pygame.init()
 width, height = 800, 600
 # pygame_display = pygame.display.set_mode(size, pygame.DOUBLEBUF | pygame.OPENGL)
@@ -94,6 +96,20 @@ def background_color(color_name=None, red_amount=None, green_amount=None, blue_a
        _background_color[0] = max(red_amount*255, 255)
        _background_color[1] = max(green_amount*255, 255)
        _background_color[2] = max(blue_amount*255, 255)
+    else:
+        if color_name == 'red':
+           _background_color[0] = 255
+           _background_color[1] = 0
+           _background_color[2] = 0
+        elif color_name == 'green':
+           _background_color[0] = 0
+           _background_color[1] = 255 
+           _background_color[2] = 0
+        elif color_name == 'blue':
+           _background_color[0] = 0
+           _background_color[1] = 0 
+           _background_color[2] = 255
+
 
 def when_clicked(sprite):
     def real_decorator(callback):
@@ -107,7 +123,10 @@ def _play_x_to_pygame_x(sprite):
 def _play_y_to_pygame_y(sprite):
     return sprite.y + (height/2.) - (sprite._pygame_surface.get_height()/2.)
 
-def repeat_forever():
+loop = asyncio.get_event_loop()
+loop.set_debug(True)
+
+def _game_loop():
     click_detected = False
     click_x = None
     click_y = None
@@ -136,7 +155,30 @@ def repeat_forever():
         _pygame_display.blit(sprite._pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
 
     pygame.display.flip()
+    loop.call_soon(_game_loop)
     return True
+
+
+async def time(seconds=0):
+    await asyncio.sleep(seconds)
+    return True
+
+def repeat_forever(func):
+
+    async def repeat_wrapper():
+        await func()
+        asyncio.create_task(repeat_wrapper())
+
+    loop.create_task(repeat_wrapper())
+    return func
+
+def start_program():
+    loop.call_soon(_game_loop)
+    try:
+        loop.run_forever()
+    finally:
+        loop.close()
+
 
 """
 cool stuff to add:
@@ -179,6 +221,13 @@ cool stuff to add:
     play.random_position()
     play.random_color()
     play.random_number(from=0, to=100)
+
+    for i in play.seconds(5):
+        # loop repeatedly for 5 seconds
+
+    prototype event loop version (problem with commands in between repeat or event blocks)
+    add images to cache for fast new sprite creation
+
 
 
 how to change background color once every half second?
