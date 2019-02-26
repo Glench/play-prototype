@@ -10,7 +10,7 @@ cat_clicked = False
 
 @cat.when_clicked
 def do():
-    global cat_clicked # it kind of stinks that we have to declare this as global to modify
+    global cat_clicked # it kind of stinks that we have to declare this as global to modify. lexical scoping :/
     cat_clicked = True
     cat.move(-40)
 
