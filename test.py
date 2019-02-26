@@ -6,20 +6,25 @@ cat = play.sprite(image='cat.png', x=0, y=0, size=1)
 label = play.text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
 
+cat_clicked = False
+
 @cat.when_clicked
 def do():
+    global cat_clicked # it kind of stinks that we have to declare this as global to modify
+    cat_clicked = True
     cat.move(-40)
 
 @play.repeat_forever
 async def do():
-    play.background_color('red')
-    await play.time(seconds=1)
+    if not cat_clicked:
+        play.background_color('red')
+        await play.time(seconds=1)
 
-    play.background_color('green')
-    await play.time(seconds=1)
+        play.background_color('green')
+        await play.time(seconds=1)
 
-    play.background_color('blue')
-    await play.time(seconds=1)
+        play.background_color('blue')
+        await play.time(seconds=1)
 
 @play.repeat_forever
 async def do():
