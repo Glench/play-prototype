@@ -32,11 +32,15 @@ async def do():
     # # but it would be better to do:
     # for i in play.repeat(10):
     #   ...
+    #   # schedule commands, including await and getting mouse position?
     #
     # # or this could work:
-    for i in play.repeat(10):
-        cat.turn(10)
+    for number in play.repeat(120):
         await play.animate()
+        cat.turn(3)
+
+    # play.repeat_instantly(10) ?
+    # play.repeat(10) ?
 
 @play.repeat_forever
 async def do():

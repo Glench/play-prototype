@@ -203,7 +203,7 @@ async def timer(seconds=1):
     await asyncio.sleep(seconds)
     return True
 
-async def animate():
+async def animate_repeat():
     await asyncio.sleep(0)
 
 def repeat_forever(func):
