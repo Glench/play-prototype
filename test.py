@@ -2,12 +2,11 @@ import play
 
 play.background_color(red_amount=1.0, blue_amount=1.0, green_amount=1.0)
 
-cat = play.new_sprite(image='cat.png', x=0, y=0, size=1)
+cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
 
 label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
 # TODO:
-#   - try queuing up commands so can do `for i in play.repeat(10)` instead of `async for i in play.repeat(10)`
 #   - figure out terminology for rotate, pointing, degrees, turning, etc
 #   - implement `when_program_starts`
 #   - refactor event loop
@@ -22,31 +21,23 @@ async def do():
 
 @cat.when_clicked
 async def do():
-    pass
-    # cat.rotate_to(angle=90)
-    # # this works:
-    # async for i in play.repeat(36):
-    #     cat.rotate(degrees=10)
-    #     await play.timer(0.5)
-    #
-    # # but it would be better to do:
-    # for i in play.repeat(10):
-    #   ...
-    #   # schedule commands, including await and getting mouse position?
-    #
-    # # or this could work:
-    for number in play.repeat(120):
-        await play.animate()
-        cat.turn(3)
-
-    # play.repeat_instantly(10) ?
-    # play.repeat(10) ?
+    if cat.size >= 200:
+        for number in play.repeat(100):
+            await play.animate()
+            cat.increase_size(percent=-1)
+            label.increase_size(percent=-1)
+    else:
+        for number in play.repeat(100):
+            await play.animate()
+            cat.increase_size(percent=1)
+            label.increase_size(percent=1)
+            # cat.turn(3)
 
 @play.repeat_forever
 async def do():
     label.go_to(cat)
-    cat.point_to(play.mouse)
-    label.angle(degrees=cat.degrees)
+    cat.point_towards(play.mouse)
+    label.degrees = cat.degrees
 
 # cat.should_move_forward = 1
 

@@ -6,6 +6,7 @@ import OpenGL.GL as gl
 
 import asyncio
 import random
+import math
 
 pygame = pygame
 pygame.init()
@@ -31,11 +32,11 @@ def new_sprite(image='cat.png', x=0, y=0, size=1):
     return sprite(image=image, x=x, y=0, size=size)
 
 class sprite(object):
-    def __init__(self, image='cat.png', x=0, y=0, size=1):
+    def __init__(self, image='cat.png', x=0, y=0, size=100):
         self.image = image
         self.x = x
         self.y = y
-        self.degrees = 0
+        self._degrees = 0
         self.size = size
 
 
@@ -51,12 +52,31 @@ class sprite(object):
         self.x += steps
 
     def turn(self, degrees=10):
-        self.degrees += degrees
-        self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self.degrees*-1)
+        self._degrees += degrees
+        self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self._degrees*-1)
+
+    @property 
+    def degrees(self):
+        return self._degrees
+
+    @degrees.setter
+    def degrees(self, _degrees):
+        self._degrees = _degrees
+        self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self._degrees*-1)
 
     def point_towards(self, angle):
-        self.angle = angle
-        self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self.angle*-1)
+        if isinstance(angle, sprite) or isinstance(angle, _mouse):
+            x, y = angle.x, angle.y
+            self._degrees = math.degrees(math.atan2(y, x))
+        else:
+            self._degrees = angle
+        self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self._degrees*-1)
+
+    def increase_size(self, percent=10):
+        self.size += percent
+        ratio = self.size/100.
+        self._pygame_surface = pygame.transform.scale(self._pygame_surface_original,
+            (round(self._pygame_surface_original.get_width() * ratio), round(self._pygame_surface_original.get_height() * ratio)))
 
     def go_to(self, sprite_or_x=None, y=None):
         if isinstance(sprite_or_x, sprite) or isinstance(sprite_or_x, _mouse):
@@ -95,11 +115,11 @@ class _mouse(object):
 
 mouse = _mouse()
 
-def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=1, color='black'):
-    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=size, color=color)
+def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, color='black'):
+    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color)
 
 class text(sprite):
-    def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=1, color='black'):
+    def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=100, color='black'):
         self._words = words
         self.x = x
         self.y = y
@@ -177,6 +197,21 @@ def _game_loop():
         if event.type == pygame.MOUSEMOTION:
             mouse.x, mouse.y = event.pos[0] - screen_width/2., event.pos[1] - screen_height/2.
 
+
+    # 1.  get pygame events
+    #       - set mouse position, clicked, keys pressed
+    # 2.  run when_program_starts callbacks
+    # 3.  run physics simulation
+    # 4.  compute new pygame_surfaces (scale, rotate)
+    # 5.  run repeat_forever callbacks
+    # 6.  run mouse/click callbacks (make sure more than one isn't running at a time)
+    # 7.  run keyboard callbacks (make sure more than one isn't running at a time)
+    # 8.  run when_touched callbacks
+    # 9.  render background
+    # 10. render sprites (with correct z-order)
+    # 11. call event loop again
+
+
     _pygame_display.fill(_background_color)
 
     # BACKGROUND COLOR
@@ -203,7 +238,7 @@ async def timer(seconds=1):
     await asyncio.sleep(seconds)
     return True
 
-async def animate_repeat():
+async def animate():
     await asyncio.sleep(0)
 
 def repeat_forever(func):
