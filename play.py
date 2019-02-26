@@ -130,8 +130,8 @@ def _play_x_to_pygame_x(sprite):
 def _play_y_to_pygame_y(sprite):
     return sprite.y + (height/2.) - (sprite._pygame_surface.get_height()/2.)
 
-loop = asyncio.get_event_loop()
-loop.set_debug(True)
+_loop = asyncio.get_event_loop()
+_loop.set_debug(True)
 
 def _game_loop():
     click_detected = False
@@ -162,7 +162,7 @@ def _game_loop():
         _pygame_display.blit(sprite._pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
 
     pygame.display.flip()
-    loop.call_soon(_game_loop)
+    _loop.call_soon(_game_loop)
     return True
 
 
@@ -176,15 +176,20 @@ def repeat_forever(func):
         await func()
         asyncio.create_task(repeat_wrapper())
 
-    loop.create_task(repeat_wrapper())
+    _loop.create_task(repeat_wrapper())
+    return func
+
+def when_program_starts(func):
+    def wrapper():
+        pass
     return func
 
 def start_program():
-    loop.call_soon(_game_loop)
+    _loop.call_soon(_game_loop)
     try:
-        loop.run_forever()
+        _loop.run_forever()
     finally:
-        loop.close()
+        _loop.close()
 
 
 """
@@ -232,7 +237,6 @@ cool stuff to add:
     for i in play.seconds(5):
         # loop repeatedly for 5 seconds
 
-    prototype event loop version (problem with commands in between repeat or event blocks)
     add images to cache for fast new sprite creation
 
 
