@@ -5,11 +5,12 @@ import pygame
 import OpenGL.GL as gl
 
 import asyncio
+import random
 
 pygame.init()
-width, height = 800, 600
+screen_width, screen_height = 800, 600
 # pygame_display = pygame.display.set_mode(size, pygame.DOUBLEBUF | pygame.OPENGL)
-_pygame_display = pygame.display.set_mode((width, height), pygame.DOUBLEBUF)
+_pygame_display = pygame.display.set_mode((screen_width, screen_height), pygame.DOUBLEBUF)
 
 
 all_sprites = []
@@ -21,6 +22,9 @@ def debug(on_or_off):
         _debug = True
     elif on_or_off == 'off':
         _debug = False
+
+def random_number(lowest=0, highest=100):
+    return random.randint(lowest, highest)
 
 def new_sprite(image='cat.png', x=0, y=0, size=1):
     return sprite(image=image, x=x, y=0, size=size)
@@ -67,10 +71,10 @@ class sprite(object):
         return self.x + self.width/2.
 
     def _pygame_x(self):
-        return self.x + (width/2.) - (self._pygame_surface.get_width()/2.)
+        return self.x + (screen_width/2.) - (self._pygame_surface.get_width()/2.)
 
     def _pygame_y(self):
-        return self.y + (height/2.) - (self._pygame_surface.get_height()/2.)
+        return self.y + (screen_height/2.) - (self._pygame_surface.get_height()/2.)
 
     def when_clicked(self, callback):
         self._when_clicked_callback = callback
@@ -201,53 +205,58 @@ cool stuff to add:
     mouse hold
     debug UI for all sprites (bounding box plus values of: x,y,image,size,width,height click state, running commands)
     key pressed
-    timer(s)
-    particle system
-    play.rectangle(x=0, y=0, width=100, height=200, color='gray', border_color='red', border_width=1)
-    play.circle(x=0, y=0, radius=10, border_width=1, border_color='red')
+    play.new_rectangle(x=0, y=0, width=100, height=200, color='gray', border_color='red', border_width=1)
+    play.new_circle(x=0, y=0, radius=10, border_width=1, border_color='red')
+    play.new_line(x=0, y=0, x_end=20, y_end=20, color='black')
     ellipse
-    line
     collision system (bouncing balls, platformer)
 
     glide to
-    wait 1 second (can use generator to set up nested game loop -- disabling any further calls –– and return control to main loop after wait?)
-    ghost effect
+    sprite.transparency(0.5)
     sprite.turn()
     sprite.remove()
-    dog.go_to(cat.bottom)
-    text.font = 
+    dog.go_to(cat.bottom) # dog.go_to(cat.bottom+5)
+    text.font = 'blah', text.font_size = 'blah', text.words = 'blah', all need to have pygame surface recomputed
+    sprite.image = 'blah.png" # change_image / animation system / costume, need to have pygame surface recomputed
     play sound / music
-    change sound volume
+    play.music('jam.mp3', loop=False)
+    play.volume = 2
     sprite.clone()
     sprite.point_to()
-    bounce
-    sprite.is_touching()
-    sprite.physics(mass, shape, velocity_x, velocity_y)
-    @sprite.when_touching
-    @sprite.when_first_touching
-    change_image / animation system / costume
-    sprite.show/hide/disable
-    sprite.change_size
-    background image
-    sprite.distance_to()
+    play.mouse_position()
+    sprite.is_touching(cat)
+    play.gravity(vertical=1.0, horizontal=0)
+    sprite.physics(heaviness=1, shape, x_velocity, y_velocity, obeys_gravity=False, bounces_off_walls=True, bounciness=1.0)
+        sprite.physics_off()
+        sprite.has_physics()
+    sprite.show()/hide() - sprite.is_shown() sprite.is_hidden()
+    sprite.size = 2
+    play.background_image('backgrounds/waterfall.png', stretch=False, x=0,y=0)
+    sprite.distance_to(cat)    # sprite.distance_to(cat.bottom)
     play.random_position()
     play.random_color()
-    play.random_number(from=0, to=100)
+    play.is_key_pressed('right') -> True
 
     for i in play.seconds(5):
-        # loop repeatedly for 5 seconds
+        # loop repeatedly for 5 seconds?
+    for count in play.repeat(5):
+        # loop 5 times, one iteration per frame
 
     add images to cache for fast new sprite creation
 
 
 
-how to change background color once every half second?
-how to do a series of actions 10 times only? (can't use forever loop. in scratch this would be when (flag) clicked, loop 10 times)
-how to make a text input box simply?
-how to make pong?
-how to make paint app?
-how to make click and drag boxes?
-how to make simple jumping box with gravity?
-how to make more advanced platformer?
+[x] how to change background color once every half second?
+[ ] how to do a series of actions 10 times only? (can't use forever loop. in scratch this would be when (flag) clicked, loop 10 times)
+[ ] how to make a text input box simply?
+[ ] how to make pong?
+[ ] how to make paint app?
+[ ] how to make click and drag boxes?
+[ ] how to make simple jumping box character with gravity?
+[ ] how to make more advanced platformer?
+
+principle:
+    - any keyword argument to an object can be set directly e.g.
+        cat.x = 5
 
 """
