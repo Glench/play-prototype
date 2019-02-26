@@ -85,7 +85,7 @@ def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=1, co
 
 class text(sprite):
     def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=1, color='black'):
-        self.words = words
+        self._words = words
         self.x = x
         self.y = y
         self.font = font
@@ -93,11 +93,21 @@ class text(sprite):
         self.size = size
 
         self._pygame_font = pygame.font.Font(self.font, self.font_size)
-        self._pygame_surface = self._pygame_font.render(words, False, (0, 0, 0))
+        self._pygame_surface = self._pygame_font.render(self._words, False, (0, 0, 0))
 
         self._when_clicked_callback = None
 
         all_sprites.append(self)
+
+    @property
+    def words(self):
+        return self._words
+
+    @words.setter
+    def words(self, string):
+        self._words = string
+        self._pygame_surface = self._pygame_font.render(self._words, False, (0, 0, 0))
+
 
 
 
@@ -226,9 +236,9 @@ cool stuff to add:
     play.mouse_position()
     sprite.is_touching(cat)
     play.gravity(vertical=1.0, horizontal=0)
-    sprite.physics(heaviness=1, shape, x_velocity, y_velocity, obeys_gravity=False, bounces_off_walls=True, bounciness=1.0)
+    sprite.physics( x_velocity, y_velocity, obeys_gravity=True, bounces_off_walls=True, heaviness=1, bounciness=1.0)
         sprite.physics_off()
-        sprite.has_physics()
+        sprite.is_physics_on()
     sprite.show()/hide() - sprite.is_shown() sprite.is_hidden()
     sprite.size = 2
     play.background_image('backgrounds/waterfall.png', stretch=False, x=0,y=0)
@@ -243,6 +253,7 @@ cool stuff to add:
         # loop 5 times, one iteration per frame
 
     add images to cache for fast new sprite creation
+    figure out how to make fonts look better
 
 
 
@@ -254,9 +265,13 @@ cool stuff to add:
 [ ] how to make click and drag boxes?
 [ ] how to make simple jumping box character with gravity?
 [ ] how to make more advanced platformer?
+[ ] how to make point and click tic-tac-toe?
+
+funny game idea: pong game where paddle shrinks unless you get powerups that spawn randomly in your zone
 
 principle:
     - any keyword argument to an object can be set directly e.g.
         cat.x = 5
+        cat.x_velocity = 10
 
 """
