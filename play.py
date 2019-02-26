@@ -16,10 +16,14 @@ all_sprites = []
 
 _debug = True
 def debug(on_or_off):
+    global _debug
     if on_or_off == 'on':
         _debug = True
     elif on_or_off == 'off':
         _debug = False
+
+def new_sprite(image='cat.png', x=0, y=0, size=1):
+    return sprite(image=image, x=x, y=0, size=size)
 
 class sprite(object):
     def __init__(self, image='cat.png', x=0, y=0, size=1):
@@ -71,6 +75,9 @@ class sprite(object):
     def when_clicked(self, callback):
         self._when_clicked_callback = callback
         return callback
+
+def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=1, color='black'):
+    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=size, color=color)
 
 class text(sprite):
     def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=1, color='black'):
@@ -159,7 +166,7 @@ def _game_loop():
     return True
 
 
-async def time(seconds=0):
+async def timer(seconds=1):
     await asyncio.sleep(seconds)
     return True
 

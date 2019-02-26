@@ -2,8 +2,8 @@ import play
 
 play.background_color(red_amount=1.0, blue_amount=1.0, green_amount=1.0)
 
-cat = play.sprite(image='cat.png', x=0, y=0, size=1)
-label = play.text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
+cat = play.new_sprite(image='cat.png', x=0, y=0, size=1)
+label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
 
 cat_clicked = False
@@ -18,13 +18,13 @@ def do():
 async def do():
     if not cat_clicked:
         play.background_color('red')
-        await play.time(seconds=1)
+        await play.timer(seconds=1)
 
         play.background_color('green')
-        await play.time(seconds=1)
+        await play.timer(seconds=1)
 
         play.background_color('blue')
-        await play.time(seconds=1)
+        await play.timer(seconds=1)
 
 @play.repeat_forever
 async def do():
