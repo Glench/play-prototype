@@ -28,7 +28,7 @@ def debug(on_or_off):
 def random_number(lowest=0, highest=100):
     return random.randint(lowest, highest)
 
-def new_sprite(image='cat.png', x=0, y=0, size=1):
+def new_sprite(image='cat.png', x=0, y=0, size=100):
     return sprite(image=image, x=x, y=0, size=size)
 
 class sprite(object):
@@ -238,7 +238,7 @@ async def timer(seconds=1):
     await asyncio.sleep(seconds)
     return True
 
-async def animate():
+async def next_frame():
     await asyncio.sleep(0)
 
 def repeat_forever(func):
@@ -288,7 +288,7 @@ cool stuff to add:
     play.mouse.is_touching() # cat.go_to(play.mouse)
     @sprite.when_touched
 
-    glide to
+    sprite.glide_to(other_sprite, seconds=1)
     sprite.transparency(0.5)
     sprite.turn()
     sprite.remove()
@@ -308,7 +308,7 @@ cool stuff to add:
         sprite.is_physics_on()
     sprite.show()/hide() - sprite.is_shown() sprite.is_hidden()
     sprite.size = 2
-    play.background_image('backgrounds/waterfall.png', stretch=False, x=0,y=0)
+    play.background_image('backgrounds/waterfall.png', fit_to_screen=False, x=0,y=0)
     sprite.distance_to(cat)    # sprite.distance_to(cat.bottom)
     play.random_position()
     play.random_color()
@@ -317,8 +317,6 @@ cool stuff to add:
 
     for i in play.seconds(5):
         # loop repeatedly for 5 seconds?
-    for count in play.repeat(5):
-        # loop 5 times, one iteration per frame
 
     add images to cache for fast new sprite creation
     figure out how to make fonts look better
@@ -326,7 +324,7 @@ cool stuff to add:
 
 
 [x] how to change background color once every half second?
-[ ] how to do a series of actions 10 times only? (can't use forever loop. in scratch this would be when (flag) clicked, loop 10 times)
+[x] how to do a series of actions 10 times only? (can't use forever loop. in scratch this would be when (flag) clicked, loop 10 times)
 [ ] how to make a text input box simply?
 [ ] how to make pong?
 [ ] how to make paint app?
@@ -339,7 +337,9 @@ funny game idea: pong game where paddle shrinks unless you get powerups that spa
 
 principle:
     - any keyword argument to an object can be set directly e.g.
-        cat.x = 5
-        cat.x_velocity = 10
+        cat = play.new_sprite(image='cat.png', x=0, y=0, ...)
+        cat.image = 'cat_with_tongue.png'
+        cat.x += 5
+        cat.y = 5
 
 """

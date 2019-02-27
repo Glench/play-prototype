@@ -7,10 +7,12 @@ cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
 label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
 # TODO:
-#   - figure out terminology for rotate, pointing, degrees, turning, etc
+#   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
 #   - implement `when_program_starts`
 #   - refactor event loop
-#   - 
+#   - @play.when_key_pressed
+#   - @play.when_key_pressed('up')
+#   - @play.when_keys_pressed('up', 'down', 'left', 'right')
 
 @play.when_program_starts
 async def do():
@@ -23,14 +25,14 @@ async def do():
 async def do():
     if cat.size >= 200:
         for number in play.repeat(100):
-            await play.animate()
             cat.increase_size(percent=-1)
             label.increase_size(percent=-1)
+            await play.next_frame()
     else:
         for number in play.repeat(100):
-            await play.animate()
             cat.increase_size(percent=1)
             label.increase_size(percent=1)
+            await play.next_frame()
             # cat.turn(3)
 
 @play.repeat_forever
