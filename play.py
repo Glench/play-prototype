@@ -8,6 +8,8 @@ import asyncio
 import random
 import math
 
+from keypress import pygame_key_to_name
+
 pygame = pygame
 pygame.init()
 screen_width, screen_height = 800, 600
@@ -174,6 +176,41 @@ def when_clicked(sprite):
         return callback
     return real_decorator
 
+_pressed_keys = []
+_keypress_callbacks = []
+def when_key_pressed(func_or_key):
+    # func example:
+    #   @play.when_key_pressed
+    #   async def do(key):...
+    # key example:
+    #   @play.when_key_pressed('a')
+    #   async def do():...
+    if callable(func_or_key): # run on any keypress
+        func = func_or_key
+        async def wrapper(*args, **kwargs):
+            await func(*args, **kwargs)
+        _keypress_callbacks.append(wrapper)
+        return wrapper
+    else: # run on specific key
+        # TODO
+        key = func_or_key
+        async def wrapper(*args, **kwargs):
+            await func(*args, **kwargs)
+        _keypress_callbacks.append(wrapper)
+        return wrapper
+
+def key_pressed(key):
+    return key in _pressed_keys
+
+def repeat_forever(func):
+
+    async def repeat_wrapper():
+        await func()
+        asyncio.create_task(repeat_wrapper())
+
+    _loop.create_task(repeat_wrapper())
+    return func
+
 def _play_x_to_pygame_x(sprite):
     return sprite.x + (width/2.) - (sprite._pygame_surface.get_width()/2.)
 
@@ -187,6 +224,8 @@ def _game_loop():
     click_detected = False
     click_x = None
     click_y = None
+    global _pressed_keys
+    _pressed_keys = []
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -196,8 +235,14 @@ def _game_loop():
             click_x, click_y = event.pos
         if event.type == pygame.MOUSEMOTION:
             mouse.x, mouse.y = event.pos[0] - screen_width/2., event.pos[1] - screen_height/2.
+        if event.type == pygame.KEYDOWN:
+            _pressed_keys.append(pygame_key_to_name(event.key))
 
 
+    if _pressed_keys:
+        for key in _pressed_keys:
+            for callback in _keypress_callbacks:
+                _loop.create_task(callback(key))
     # 1.  get pygame events
     #       - set mouse position, clicked, keys pressed
     # 2.  run when_program_starts callbacks

@@ -11,6 +11,8 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - implement `when_program_starts`
 #   - refactor event loop
 #   - @play.when_key_pressed
+#       - properly detect keypresses with shift+key
+#       - how to deal with held-down key?
 #   - @play.when_key_pressed('up')
 #   - @play.when_keys_pressed('up', 'down', 'left', 'right')
 
@@ -20,6 +22,17 @@ async def do():
     await play.timer(seconds=5)
     cat.x = 0
 
+@play.when_key_pressed
+async def do(key):
+    print(key)
+    if key == 'up':
+        cat.y -= 20
+    if key == 'down':
+        cat.y += 20
+    if key == 'right':
+        cat.x += 20
+    if key == 'left':
+        cat.x -= 20
 
 @cat.when_clicked
 async def do():
