@@ -171,29 +171,21 @@ def when_clicked(sprite):
         return callback
     return real_decorator
 
-pygame.key.set_repeat(100, 50)
+pygame.key.set_repeat(100, 16)
 _pressed_keys = []
 _keypress_callbacks = []
-def when_key_pressed(func_or_key):
-    # func example:
-    #   @play.when_key_pressed
-    #   async def do(key):...
-    # key example:
-    #   @play.when_key_pressed('a')
-    #   async def do():...
-    if callable(func_or_key): # run on any keypress
-        func = func_or_key
-        async def wrapper(*args, **kwargs):
-            await func(*args, **kwargs)
-        _keypress_callbacks.append(wrapper)
-        return wrapper
-    else: # run on specific key
-        # TODO
-        key = func_or_key
-        async def wrapper(*args, **kwargs):
-            await func(*args, **kwargs)
-        _keypress_callbacks.append(wrapper)
-        return wrapper
+def when_any_key_pressed(func):
+    async def wrapper(*args, **kwargs):
+        await func(*args, **kwargs)
+    _keypress_callbacks.append(wrapper)
+    return wrapper
+
+def when_key_pressed(*keys):
+    # TODO
+    async def wrapper(*args, **kwargs):
+        await func(*args, **kwargs)
+    _keypress_callbacks.append(wrapper)
+    return wrapper
 
 def is_key_pressed(*keys):
     for key in keys:

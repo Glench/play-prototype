@@ -12,7 +12,7 @@ key_text = play.new_text(words='last key pressed: ', x=-200, y=-200, font='Arial
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
 #   - implement `when_program_starts`
 #   - refactor event loop
-#   - @play.when_key_pressed
+#   - @play.when_any_key_pressed
 #       - properly detect keypresses with shift+key
 #       - how to deal with held-down key?
 #       - how to deal with multiple keys pressed
@@ -25,7 +25,7 @@ async def do():
     await play.timer(seconds=5)
     cat.x = 0
 
-@play.when_key_pressed
+@play.when_any_key_pressed
 async def do(key):
     key_text.words = 'last key pressed: {}'.format(key)
 
