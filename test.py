@@ -6,7 +6,7 @@ cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
 
 label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
-key_text = play.new_text(words='key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='white')
+key_text = play.new_text(words='last key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='white')
 
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
