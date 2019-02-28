@@ -26,6 +26,10 @@ async def do():
     await play.timer(seconds=5)
     cat.x = 0
 
+@play.when_key_pressed('space', 'backspace')
+async def do(key):
+    play.new_text(words=f'{key}!', x=0, y=0, font='Arial.ttf', font_size=100, color='black')
+
 @play.when_any_key_pressed
 async def do(key):
 

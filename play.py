@@ -174,21 +174,28 @@ def when_clicked(sprite):
 pygame.key.set_repeat(100, 16)
 _pressed_keys = []
 _keypress_callbacks = []
+
 def when_any_key_pressed(func):
     async def wrapper(*args, **kwargs):
         wrapper.is_running = True
         await func(*args, **kwargs)
         wrapper.is_running = False
+    wrapper.keys = None
     wrapper.is_running = False
     _keypress_callbacks.append(wrapper)
     return wrapper
 
 def when_key_pressed(*keys):
-    # TODO
-    async def wrapper(*args, **kwargs):
-        await func(*args, **kwargs)
-    _keypress_callbacks.append(wrapper)
-    return wrapper
+    def decorator(func):
+        async def wrapper(*args, **kwargs):
+            wrapper.is_running = True
+            await func(*args, **kwargs)
+            wrapper.is_running = False
+        wrapper.keys = keys
+        wrapper.is_running = False
+        _keypress_callbacks.append(wrapper)
+        return wrapper
+    return decorator
 
 def is_key_pressed(*keys):
     for key in keys:
@@ -219,7 +226,7 @@ def _game_loop():
     click_x = None
     click_y = None
     global _pressed_keys
-    _pressed_keys = []
+    _pressed_keys.clear()
 
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -236,7 +243,7 @@ def _game_loop():
     if _pressed_keys:
         for key in _pressed_keys:
             for callback in _keypress_callbacks:
-                if not callback.is_running:
+                if not callback.is_running and (callback.keys is None or key in callback.keys):
                     _loop.create_task(callback(key))
     # 1.  get pygame events
     #       - set mouse position, clicked, keys pressed

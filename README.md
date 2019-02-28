@@ -3,11 +3,8 @@
 Create a new virtual environment, run `pip install -r requirements.txt`, then run `python test.py` :)
 
 
-@play.when_key_pressed
-play.is_key_pressed(key...)
+All events should have a corresponding boolean method e.g.:
 
-@sprite.when_clicked
-sprite.is_clicked()
+`@when_key_pressed('left', 'a')`
 
-@play.repeat_forever
-
+`play.is_key_pressed('left', 'a')`
