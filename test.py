@@ -10,6 +10,7 @@ key_text = play.new_text(words='last key pressed: ', x=-200, y=-200, font='Arial
 
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
+#   - fix rotation when not in center of screen
 #   - implement `when_program_starts`
 #   - refactor event loop
 #   - @play.when_any_key_pressed
@@ -27,7 +28,6 @@ async def do():
 
 @play.when_any_key_pressed
 async def do(key):
-    key_text.words = 'last key pressed: {}'.format(key)
 
     if key == 'up':
         cat.y -= 20
@@ -37,6 +37,10 @@ async def do(key):
         cat.x += 20
     if key == 'left':
         cat.x -= 20
+
+@play.when_any_key_pressed
+async def do(key):
+    key_text.words = 'last key pressed: {}'.format(key)
 
 @cat.when_clicked
 async def do():

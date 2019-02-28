@@ -176,7 +176,10 @@ _pressed_keys = []
 _keypress_callbacks = []
 def when_any_key_pressed(func):
     async def wrapper(*args, **kwargs):
+        wrapper.is_running = True
         await func(*args, **kwargs)
+        wrapper.is_running = False
+    wrapper.is_running = False
     _keypress_callbacks.append(wrapper)
     return wrapper
 
@@ -233,7 +236,8 @@ def _game_loop():
     if _pressed_keys:
         for key in _pressed_keys:
             for callback in _keypress_callbacks:
-                _loop.create_task(callback(key))
+                if not callback.is_running:
+                    _loop.create_task(callback(key))
     # 1.  get pygame events
     #       - set mouse position, clicked, keys pressed
     # 2.  run when_program_starts callbacks
