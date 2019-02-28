@@ -13,6 +13,7 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - @play.when_key_pressed
 #       - properly detect keypresses with shift+key
 #       - how to deal with held-down key?
+#       - how to deal with multiple keys pressed
 #   - @play.when_key_pressed('up')
 #   - @play.when_keys_pressed('up', 'down', 'left', 'right')
 
@@ -36,6 +37,7 @@ async def do(key):
 
 @cat.when_clicked
 async def do():
+    print(label.words)
     if cat.size >= 200:
         for number in play.repeat(100):
             cat.increase_size(percent=-1)

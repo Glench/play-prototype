@@ -144,7 +144,8 @@ class text(sprite):
     @words.setter
     def words(self, string):
         self._words = string
-        self._pygame_surface = self._pygame_font.render(self._words, False, (0, 0, 0))
+        self._pygame_surface_original = self._pygame_font.render(self._words, False, (0, 0, 0))
+        self._pygame_surface = self._pygame_surface_original
 
 
 
@@ -176,6 +177,7 @@ def when_clicked(sprite):
         return callback
     return real_decorator
 
+pygame.key.set_repeat(100, 50)
 _pressed_keys = []
 _keypress_callbacks = []
 def when_key_pressed(func_or_key):
@@ -199,8 +201,11 @@ def when_key_pressed(func_or_key):
         _keypress_callbacks.append(wrapper)
         return wrapper
 
-def key_pressed(key):
-    return key in _pressed_keys
+def is_key_pressed(*keys):
+    for key in keys:
+        if key in _pressed_keys:
+            return True
+    return False
 
 def repeat_forever(func):
 
