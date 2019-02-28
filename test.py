@@ -6,6 +6,8 @@ cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
 
 label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
+key_text = play.new_text(words='key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='white')
+
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
 #   - implement `when_program_starts`
@@ -25,7 +27,8 @@ async def do():
 
 @play.when_key_pressed
 async def do(key):
-    print(key)
+    key_text.words = 'last key pressed: {}'.format(key)
+
     if key == 'up':
         cat.y -= 20
     if key == 'down':

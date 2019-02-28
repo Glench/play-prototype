@@ -9,6 +9,7 @@ import random
 import math
 
 from keypress import pygame_key_to_name
+from color import color_name_to_rgb
 
 pygame = pygame
 pygame.init()
@@ -162,14 +163,7 @@ def background_color(color=None, red_amount=None, green_amount=None, blue_amount
     elif isinstance(color, tuple):
         _background_color = color
     else:
-        if color == 'red':
-           _background_color = (255, 0, 0)
-        elif color == 'green':
-           _background_color = (0, 255, 0)
-        elif color == 'blue':
-           _background_color = (0, 0, 255)
-
-
+        _background_color = color_name_to_rgb(color)
 
 def when_clicked(sprite):
     def real_decorator(callback):
@@ -344,9 +338,11 @@ cool stuff to add:
     sprite.remove()
     dog.go_to(cat.bottom) # dog.go_to(cat.bottom+5)
     text.font = 'blah', text.font_size = 'blah', text.words = 'blah', all need to have pygame surface recomputed
-    sprite.image = 'blah.png" # change_image / animation system / costume, need to have pygame surface recomputed
+    sprite.image = 'blah.png", sprite.size, sprite.angle # change_image / animation system / costume, need to have pygame surface recomputed
     play sound / music
     play.music('jam.mp3', loop=False)
+    play.stop_music('jam.mp3')
+    play.sound('jam.mp3')
     play.volume = 2
     sprite.clone()
     sprite.point_to()
@@ -381,6 +377,7 @@ cool stuff to add:
 [ ] how to make click and drag boxes?
 [ ] how to make simple jumping box character with gravity?
 [ ] how to make more advanced platformer?
+[ ] how to make shooter? http://osmstudios.com/tutorials/your-first-love2d-game-in-200-lines-part-1-of-3
 [ ] how to make point and click tic-tac-toe?
 
 funny game idea: pong game where paddle shrinks unless you get powerups that spawn randomly in your zone
