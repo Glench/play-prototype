@@ -113,8 +113,13 @@ class sprite(object):
         return callback
 
 class _mouse(object):
-    x = 0
-    y = 0
+    def __init__(self):
+        self.x = 0
+        self.y = 0
+        self._is_clicked = False
+
+    def is_clicked(self):
+        return self._is_clicked
 
 mouse = _mouse()
 
@@ -222,9 +227,7 @@ _loop = asyncio.get_event_loop()
 _loop.set_debug(True)
 
 def _game_loop():
-    click_detected = False
-    click_x = None
-    click_y = None
+    mouse._is_clicked = False
     global _pressed_keys
     _pressed_keys.clear()
 
@@ -232,19 +235,24 @@ def _game_loop():
         if event.type == pygame.QUIT:
             return False
         if event.type == pygame.MOUSEBUTTONDOWN:
-            click_detected = True
-            click_x, click_y = event.pos
+            mouse._is_clicked = True
         if event.type == pygame.MOUSEMOTION:
             mouse.x, mouse.y = event.pos[0] - screen_width/2., event.pos[1] - screen_height/2.
         if event.type == pygame.KEYDOWN:
             _pressed_keys.append(pygame_key_to_name(event.key))
 
 
+    ####################
+    # keypress events
+    ####################
+
     if _pressed_keys:
         for key in _pressed_keys:
             for callback in _keypress_callbacks:
                 if not callback.is_running and (callback.keys is None or key in callback.keys):
                     _loop.create_task(callback(key))
+
+
     # 1.  get pygame events
     #       - set mouse position, clicked, keys pressed
     # 2.  run when_program_starts callbacks
@@ -268,9 +276,16 @@ def _game_loop():
     # gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
     for sprite in all_sprites:
-        if click_detected and sprite._when_clicked_callback:
 
-            if sprite._pygame_surface.get_rect().collidepoint(click_x-sprite._pygame_x(), click_y-sprite._pygame_y()):
+        ####################
+        # mouse click on sprite events
+        ####################
+        
+        if mouse.is_clicked() and sprite._when_clicked_callback:
+            # get_rect().collidepoint() is local coordinates, e.g. 100x100 image, so have to translate
+            # TODO: allow multiple click callbacks per sprite
+            # TODO: make sure same callback doesn't run more than once at a time
+            if sprite._pygame_surface.get_rect().collidepoint((mouse.x+screen_width/2)-sprite._pygame_x(), (mouse.y+screen_height/2)-sprite._pygame_y()):
                 _loop.create_task(sprite._when_clicked_callback())
                 # sprite._when_clicked_callback()
 
@@ -370,6 +385,7 @@ cool stuff to add:
     add images to cache for fast new sprite creation
     figure out how to make fonts look better
 
+    box2d is_fixed_rotation good for platformers
 
 
 [x] how to change background color once every half second?
