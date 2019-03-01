@@ -189,8 +189,11 @@ class text(sprite):
     def color(self):
         return self._color
 
-    @color.setter(self, color):
+    @color.setter
+    def set_color(self, color):
         self._color = color
+        self._pygame_surface_original = self._pygame_font.render(self._words, False, color_name_to_rgb(self.color))
+        self._pygame_surface = self._pygame_surface_original
 
 
 
