@@ -176,7 +176,7 @@ def when_clicked(sprite):
         return callback
     return real_decorator
 
-pygame.key.set_repeat(100, 16)
+pygame.key.set_repeat(200, 16)
 _pressed_keys = []
 _keypress_callbacks = []
 
@@ -203,13 +203,19 @@ def when_key_pressed(*keys):
     return decorator
 
 def is_key_pressed(*keys):
+    """
+    Returns True if any of the keys are pressed.
+
+    Example:
+
+        play.is_key_pressed('up', 'w') -> True
+    """
     for key in keys:
         if key in _pressed_keys:
             return True
     return False
 
 def repeat_forever(func):
-
     async def repeat_wrapper():
         await func()
         asyncio.create_task(repeat_wrapper())
@@ -280,7 +286,7 @@ def _game_loop():
         ####################
         # mouse click on sprite events
         ####################
-        
+
         if mouse.is_clicked() and sprite._when_clicked_callback:
             # get_rect().collidepoint() is local coordinates, e.g. 100x100 image, so have to translate
             # TODO: allow multiple click callbacks per sprite
@@ -304,7 +310,18 @@ async def next_frame():
     await asyncio.sleep(0)
 
 def repeat_forever(func):
+    """
+    Calls the given function repeatedly.
 
+    Example:
+
+        text = play.new_text(words='hi there!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
+
+        @play.repeat_forever
+        async def do():
+            text.turn(degrees=15)
+
+    """
     async def repeat_wrapper():
         await func()
         asyncio.create_task(repeat_wrapper())
@@ -312,20 +329,21 @@ def repeat_forever(func):
     _loop.create_task(repeat_wrapper())
     return func
 
+
+_when_program_starts_callbacks = []
 def when_program_starts(func):
-    def wrapper():
-        pass
+    async def wrapper(*args, **kwargs):
+        return await func(*args, **kwargs)
+    _when_program_starts_callbacks.append(wrapper)
     return func
 
 def repeat(number_of_times):
     return range(1, number_of_times+1)
-    # set global queuing flag
-    # for x in range(1, number_of_times+1):
-    #     await asyncio.sleep(0)
-    #     yield x
-    # return 
 
 def start_program():
+    for func in _when_program_starts_callbacks:
+        _loop.create_task(func())
+
     _loop.call_soon(_game_loop)
     try:
         _loop.run_forever()

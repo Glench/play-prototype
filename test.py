@@ -11,28 +11,43 @@ key_text = play.new_text(words='last key pressed: ', x=-200, y=-200, font='Arial
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
 #   - fix rotation when not in center of screen
-#   - implement `when_program_starts`
 #   - refactor event loop
 #   - @play.when_any_key_pressed
 #       - properly detect keypresses with shift+key
-#       - how to deal with held-down key?
-#       - how to deal with multiple keys pressed
-#   - @play.when_key_pressed('up')
-#   - @play.when_keys_pressed('up', 'down', 'left', 'right')
+
+cat.should_rotate = False
 
 @play.when_program_starts
 async def do():
-    cat.x = -10
-    await play.timer(seconds=5)
-    cat.x = 0
+    label.words = 'program started!'
+    await play.timer(seconds=2)
+    label.words = 'click this cat!'
+
+    await play.timer(seconds=2)
+    cat.should_rotate = True
 
 @play.when_key_pressed('space', 'backspace')
 async def do(key):
-    play.new_text(words=f'{key}!', x=0, y=0, font='Arial.ttf', font_size=100, color='black')
+    temp_text = play.new_text(words=f'{key} pressed!', x=0, y=0, font='Arial.ttf', font_size=80, color='black')
+    await play.timer(seconds=1)
+    temp_text.words = ''
+
+typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color='white')
 
 @play.when_any_key_pressed
 async def do(key):
+    if key == 'space':
+        key = ' '
+    elif key in ['up', 'left', 'down', 'right', 'shift', 'meta', 'super', 'control']:
+        key = ''
 
+    if key == 'backspace':
+        typed_text.words = typed_text.words[:-1]
+    else:
+        typed_text.words += key
+
+@play.when_any_key_pressed
+async def do(key):
     if key == 'up':
         cat.y -= 20
     if key == 'down':
@@ -64,8 +79,9 @@ async def do():
 @play.repeat_forever
 async def do():
     label.go_to(cat)
-    cat.point_towards(play.mouse)
-    label.degrees = cat.degrees
+    if cat.should_rotate:
+        cat.point_towards(play.mouse)
+        label.degrees = cat.degrees
 
 # cat.should_move_forward = 1
 
