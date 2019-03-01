@@ -13,8 +13,11 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - implement @when_key_let_go, @when_any_key_let_go
 #   - combine rotation/size/transparency image transforms so they work together
 #   - combine font/font size/rotation/size image transforms so they work together
-#   - allow multiple @cat.when_clicked callbacks
 #   - properly detect keypresses with shift+key, like !
+# boring, easy work:
+#   - add all color names
+#   - allow multiple @cat.when_clicked callbacks, stop from running the same simultaneously
+#   - fix @sprite.when_clicked so it only runs on the frame the click happened, while mouse.is_clicked() and sprite.is_clicked() work across frames (?)
 
 cat.should_rotate = False
 
@@ -80,6 +83,11 @@ async def do():
 
 @play.repeat_forever
 async def do():
+    if key_text.is_clicked(): # FIXME: why doesn't this work?
+        print('hi')
+
+@play.repeat_forever
+async def do():
     label.go_to(cat)
     if cat.should_rotate:
         cat.point_towards(play.mouse)
@@ -114,7 +122,6 @@ async def do():
 
     play.set_background_color('blue')
     await play.timer(seconds=1)
-
 
 play.start_program() # this line should be the last line in your program
 

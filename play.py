@@ -42,6 +42,7 @@ class sprite(object):
         self._degrees = 0
         self.size = size
 
+        self._is_clicked = False
 
         self._pygame_surface_original = pygame.image.load(os.path.join(image)).convert()
         self._pygame_surface_original.set_colorkey((255,255,255)) # set background to transparent
@@ -50,6 +51,9 @@ class sprite(object):
         self._when_clicked_callback = None
 
         all_sprites.append(self)
+
+    def is_clicked(self):
+        return self._is_clicked
 
     def move(self, steps):
         self.x += steps
@@ -83,7 +87,12 @@ class sprite(object):
         """
         Example:
 
-            sprite.go_to(play.mouse)
+            # text will follow around the mouse
+            text = play.new_text(words='yay', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
+
+            @play.repeat_forever
+            async def do():
+                text.go_to(play.mouse)
         """
         assert(not sprite_or_x is None)
 
@@ -154,9 +163,12 @@ class text(sprite):
         self.font = font
         self.font_size = font_size
         self.size = size
+        self._color = color
+
+        self._is_clicked = False
 
         self._pygame_font = pygame.font.Font(self.font, self.font_size)
-        self._pygame_surface_original = self._pygame_font.render(self._words, False, (0, 0, 0))
+        self._pygame_surface_original = self._pygame_font.render(self._words, False, color_name_to_rgb(self.color))
         self._pygame_surface = self._pygame_surface_original
 
         self._when_clicked_callback = None
@@ -170,8 +182,15 @@ class text(sprite):
     @words.setter
     def words(self, string):
         self._words = str(string)
-        self._pygame_surface_original = self._pygame_font.render(self._words, False, (0, 0, 0))
+        self._pygame_surface_original = self._pygame_font.render(self._words, False, color_name_to_rgb(self.color))
         self._pygame_surface = self._pygame_surface_original
+
+    @property 
+    def color(self):
+        return self._color
+
+    @color.setter(self, color):
+        self._color = color
 
 
 
@@ -248,7 +267,6 @@ _loop = asyncio.get_event_loop()
 _loop.set_debug(True)
 
 def _game_loop():
-    mouse._is_clicked = False
     global _pressed_keys
     _pressed_keys.clear()
 
@@ -257,6 +275,8 @@ def _game_loop():
             return False
         if event.type == pygame.MOUSEBUTTONDOWN:
             mouse._is_clicked = True
+        if event.type == pygame.MOUSEBUTTONUP:
+            mouse._is_clicked = False
         if event.type == pygame.MOUSEMOTION:
             mouse.x, mouse.y = event.pos[0] - screen_width/2., event.pos[1] - screen_height/2.
         if event.type == pygame.KEYDOWN:
@@ -275,7 +295,7 @@ def _game_loop():
 
 
     # 1.  get pygame events
-    #       - set mouse position, clicked, keys pressed
+    #       - set mouse position, clicked, keys pressed, keys released
     # 2.  run when_program_starts callbacks
     # 3.  run physics simulation
     # 4.  compute new pygame_surfaces (scale, rotate)
@@ -303,13 +323,12 @@ def _game_loop():
         # mouse click on sprite events
         ####################
 
+        sprite._is_clicked = False
         if mouse.is_clicked() and sprite._when_clicked_callback:
             # get_rect().collidepoint() is local coordinates, e.g. 100x100 image, so have to translate
-            # TODO: allow multiple click callbacks per sprite
-            # TODO: make sure same callback doesn't run more than once at a time
-            if sprite._pygame_surface.get_rect().collidepoint((mouse.x+screen_width/2)-sprite._pygame_x(), (mouse.y+screen_height/2)-sprite._pygame_y()):
+            if sprite._pygame_surface.get_rect().collidepoint((mouse.x+screen_width/2.)-sprite._pygame_x(), (mouse.y+screen_height/2.)-sprite._pygame_y()):
+                sprite._is_clicked = True
                 _loop.create_task(sprite._when_clicked_callback())
-                # sprite._when_clicked_callback()
 
         _pygame_display.blit(sprite._pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
 
