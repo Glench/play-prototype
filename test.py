@@ -2,7 +2,7 @@ import play
 
 play.set_background_color((255,255,255))
 
-cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
+cat = play.new_sprite(image='cat.png', x=1000, y=1000, size=100)
 
 label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
@@ -24,20 +24,16 @@ async def do():
 
 cat.should_rotate = False
 
+
 @play.when_program_starts
 async def do():
-    label.words = 'program started!'
-    await play.timer(seconds=2)
-    label.words = 'click this cat!'
+    # label.words = 'program started!'
+    # await play.timer(seconds=2)
+    # label.words = 'click this cat!'
 
     await play.timer(seconds=2)
     cat.should_rotate = True
 
-@play.when_key_pressed('space', 'backspace')
-async def do(key):
-    temp_text = play.new_text(words=f'{key} pressed!', x=0, y=0, font='Arial.ttf', font_size=80, color='black')
-    await play.timer(seconds=1)
-    temp_text.words = ''
 
 typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color=(255,255,255, .3))
 
@@ -53,25 +49,37 @@ async def do(key):
     else:
         typed_text.words += key
 
-@play.when_any_key_pressed
-async def do(key):
-    if key == 'up':
-        cat.y -= 20
-    if key == 'down':
-        cat.y += 20
-    if key == 'right':
-        cat.x += 20
-    if key == 'left':
-        cat.x -= 20
-
-key_text = play.new_text(words='last key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='white')
+key_text = play.new_text(words='keys pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
 
 @play.when_any_key_pressed
 async def do(key):
-    key_text.words = 'last key pressed: {}'.format(key)
+    key_text.words = f'key pressed: {key}'
+
+    # if key == 'up':
+    #     cat.y -= 20
+    # if key == 'down':
+    #     cat.y += 20
+    # if key == 'right':
+    #     cat.x += 20
+    # if key == 'left':
+    #     cat.x -= 20
+
+@play.when_key_pressed('space', 'backspace')
+async def do(key):
+    temp_text = play.new_text(words=f'{key} pressed!', x=0, y=-150, font='Arial.ttf', font_size=80, color='black')
+    await play.timer(seconds=1)
+    temp_text.words = ''
+
+
+
 
 @cat.when_clicked
 async def do():
+    label.words = 'cat clicked! :3'
+    await play.timer(seconds=2)
+    label.words = ''
+
+    return 
     if cat.size >= 200:
         for number in play.repeat(100):
             cat.increase_size(percent=-1)
@@ -89,15 +97,18 @@ async def do():
     if key_text.is_clicked(): # FIXME: why doesn't this work?
         print('hi')
 
+label.words = ''
+
 @play.repeat_forever
 async def do():
-    label.go_to(cat)
-    if cat.should_rotate:
-        cat.point_towards(play.mouse)
+    return
+    cat.point_towards(play.mouse)
 
-        # FIXME: switching the order of these two statements causes the text not to rotate 
-        label.words = cat.distance_to(play.mouse)
-        label.degrees = cat.degrees
+    label.go_to(cat)
+
+    # FIXME: switching the order of these two statements causes the text not to rotate 
+    # label.words = cat.distance_to(play.mouse)
+    # label.degrees = cat.degrees
 
 # cat.should_move_forward = 1
 
@@ -114,17 +125,17 @@ async def do():
 #     label.turn_toward(cat.degrees)
 
 
-@play.repeat_forever
-async def do():
+# @play.repeat_forever
+# async def do():
 
-    play.set_background_color('red')
-    await play.timer(seconds=1)
+#     play.set_background_color('red')
+#     await play.timer(seconds=1)
 
-    play.set_background_color('green')
-    await play.timer(seconds=1)
+#     play.set_background_color('green')
+#     await play.timer(seconds=1)
 
-    play.set_background_color('blue')
-    await play.timer(seconds=1)
+#     play.set_background_color('blue')
+#     await play.timer(seconds=1)
 
 play.start_program() # this line should be the last line in your program
 

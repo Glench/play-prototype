@@ -238,7 +238,7 @@ def when_clicked(*sprites):
     return real_decorator
 
 pygame.key.set_repeat(200, 16)
-_pressed_keys = set()
+pressed_keys = set()
 _keypress_callbacks = []
 
 def when_any_key_pressed(func):
@@ -275,7 +275,7 @@ def is_key_pressed(*keys):
                 print('up or w pressed')
     """
     for key in keys:
-        if key in _pressed_keys:
+        if key in pressed_keys:
             return True
     return False
 
@@ -290,9 +290,9 @@ _loop.set_debug(True)
 
 _keys_pressed_this_frame = []
 def _game_loop():
-    _keys_pressed_this_frame.clear() # do this instead of `keys_pressed_this_frame = []` to save memory
-
+    _keys_pressed_this_frame.clear() # do this instead of `_keys_pressed_this_frame = []` to save a tiny bit of memory
     click_happened_this_frame = False
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return False
@@ -304,17 +304,17 @@ def _game_loop():
         if event.type == pygame.MOUSEMOTION:
             mouse.x, mouse.y = event.pos[0] - screen_width/2., event.pos[1] - screen_height/2.
         if event.type == pygame.KEYDOWN:
-            _pressed_keys.add(pygame_key_to_name(event.key))
+            pressed_keys.add(pygame_key_to_name(event.key))
             _keys_pressed_this_frame.append(pygame_key_to_name(event.key))
         if event.type == pygame.KEYUP:
-            _pressed_keys.remove(pygame_key_to_name(event.key))
+            pressed_keys.remove(pygame_key_to_name(event.key))
 
 
 
     ####################################
     # @when_any_key_pressed callbacks
     ####################################
-    if _pressed_keys:
+    if _keys_pressed_this_frame:
         for key in _keys_pressed_this_frame:
             for callback in _keypress_callbacks:
                 if not callback.is_running and (callback.keys is None or key in callback.keys):
