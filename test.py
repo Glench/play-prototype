@@ -9,8 +9,7 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
-#   - refactor event loop
-#   - implement @when_key_let_go, @when_any_key_let_go
+#   - implement @when_key_released, @when_any_key_released
 #   - combine rotation/size/transparency image transforms so they work together
 #   - combine font/font size/rotation/size image transforms so they work together
 #   - properly detect keypresses with shift+key, like !

@@ -151,9 +151,19 @@ class _mouse(object):
         self.x = 0
         self.y = 0
         self._is_clicked = False
+        self._when_clicked_callbacks = []
 
     def is_clicked(self):
         return self._is_clicked
+
+    def when_clicked(self, async_callback):
+        async def wrapper():
+            wrapper.is_running = True
+            await async_callback()
+            wrapper.is_running = False
+        wrapper.is_running = False
+        self._when_clicked_callbacks.append(wrapper)
+        return wrapper
 
 mouse = _mouse()
 
@@ -302,6 +312,15 @@ def _game_loop():
             for callback in _keypress_callbacks:
                 if not callback.is_running and (callback.keys is None or key in callback.keys):
                     _loop.create_task(callback(key))
+
+
+    ####################################
+    # @mouse.when_clicked callbacks
+    ####################################
+    if click_happened_this_frame and mouse._when_clicked_callbacks:
+        for callback in mouse._when_clicked_callbacks:
+            if not callback.is_running:
+                _loop.create_task(callback())
 
 
     #############################
