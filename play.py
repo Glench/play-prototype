@@ -288,9 +288,10 @@ def _play_y_to_pygame_y(sprite):
 _loop = asyncio.get_event_loop()
 _loop.set_debug(True)
 
+_keys_pressed_this_frame = []
 def _game_loop():
+    _keys_pressed_this_frame.clear() # do this instead of `keys_pressed_this_frame = []` to save memory
 
-    keys_pressed_this_frame = []
     click_happened_this_frame = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -304,7 +305,7 @@ def _game_loop():
             mouse.x, mouse.y = event.pos[0] - screen_width/2., event.pos[1] - screen_height/2.
         if event.type == pygame.KEYDOWN:
             _pressed_keys.add(pygame_key_to_name(event.key))
-            keys_pressed_this_frame.append(pygame_key_to_name(event.key))
+            _keys_pressed_this_frame.append(pygame_key_to_name(event.key))
         if event.type == pygame.KEYUP:
             _pressed_keys.remove(pygame_key_to_name(event.key))
 
@@ -314,7 +315,7 @@ def _game_loop():
     # @when_any_key_pressed callbacks
     ####################################
     if _pressed_keys:
-        for key in keys_pressed_this_frame:
+        for key in _keys_pressed_this_frame:
             for callback in _keypress_callbacks:
                 if not callback.is_running and (callback.keys is None or key in callback.keys):
                     _loop.create_task(callback(key))
