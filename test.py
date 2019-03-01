@@ -16,8 +16,7 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - properly detect keypresses with shift+key, like !
 # boring, easy work:
 #   - add all color names
-#   - allow multiple @cat.when_clicked callbacks, stop from running the same simultaneously
-#   - fix @sprite.when_clicked so it only runs on the frame the click happened, while mouse.is_clicked() and sprite.is_clicked() work across frames (?)
+
 
 cat.should_rotate = False
 

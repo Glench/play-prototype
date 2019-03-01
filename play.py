@@ -48,7 +48,7 @@ class sprite(object):
         self._pygame_surface_original.set_colorkey((255,255,255)) # set background to transparent
         self._pygame_surface = self._pygame_surface_original
 
-        self._when_clicked_callback = None
+        self._when_clicked_callbacks = []
 
         all_sprites.append(self)
 
@@ -137,9 +137,14 @@ class sprite(object):
     def _pygame_y(self):
         return self.y + (screen_height/2.) - (self._pygame_surface.get_height()/2.)
 
-    def when_clicked(self, callback):
-        self._when_clicked_callback = callback
-        return callback
+    def when_clicked(self, async_callback):
+        async def wrapper():
+            wrapper.is_running = True
+            await async_callback()
+            wrapper.is_running = False
+        wrapper.is_running = False
+        self._when_clicked_callbacks.append(wrapper)
+        return wrapper
 
 class _mouse(object):
     def __init__(self):
@@ -171,7 +176,7 @@ class text(sprite):
         self._pygame_surface_original = self._pygame_font.render(self._words, False, color_name_to_rgb(self.color))
         self._pygame_surface = self._pygame_surface_original
 
-        self._when_clicked_callback = None
+        self._when_clicked_callbacks = []
 
         all_sprites.append(self)
 
@@ -216,10 +221,10 @@ def set_background_color(color):
     else:
         background_color = color_name_to_rgb(color)
 
-def when_clicked(sprite):
-    def real_decorator(callback):
+def when_clicked(*sprites):
+    # TODO
+    for sprite in sprites:
         sprite.when_clicked(callback)
-        return callback
     return real_decorator
 
 pygame.key.set_repeat(200, 16)
@@ -261,14 +266,6 @@ def is_key_pressed(*keys):
             return True
     return False
 
-def repeat_forever(func):
-    async def repeat_wrapper():
-        await func()
-        asyncio.create_task(repeat_wrapper())
-
-    _loop.create_task(repeat_wrapper())
-    return func
-
 def _play_x_to_pygame_x(sprite):
     return sprite.x + (width/2.) - (sprite._pygame_surface.get_width()/2.)
 
@@ -282,10 +279,12 @@ def _game_loop():
     global _pressed_keys
     _pressed_keys.clear()
 
+    click_happened_this_frame = False
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             return False
         if event.type == pygame.MOUSEBUTTONDOWN:
+            click_happened_this_frame = True
             mouse._is_clicked = True
         if event.type == pygame.MOUSEBUTTONUP:
             mouse._is_clicked = False
@@ -295,16 +294,22 @@ def _game_loop():
             _pressed_keys.append(pygame_key_to_name(event.key))
 
 
-    ####################
-    # keypress events
-    ####################
-
+    ####################################
+    # @when_any_key_pressed callbacks
+    ####################################
     if _pressed_keys:
         for key in _pressed_keys:
             for callback in _keypress_callbacks:
                 if not callback.is_running and (callback.keys is None or key in callback.keys):
                     _loop.create_task(callback(key))
 
+
+    #############################
+    # @repeat_forever callbacks
+    #############################
+    for callback in _repeat_forever_callbacks:
+        if not callback.is_running:
+            _loop.create_task(callback())
 
     # 1.  get pygame events
     #       - set mouse position, clicked, keys pressed, keys released
@@ -331,16 +336,20 @@ def _game_loop():
 
     for sprite in all_sprites:
 
-        ####################
-        # mouse click on sprite events
-        ####################
-
+        #################################
+        # @sprite.when_clicked events
+        #################################
         sprite._is_clicked = False
-        if mouse.is_clicked() and sprite._when_clicked_callback:
+        if mouse.is_clicked() and sprite._when_clicked_callbacks:
             # get_rect().collidepoint() is local coordinates, e.g. 100x100 image, so have to translate
             if sprite._pygame_surface.get_rect().collidepoint((mouse.x+screen_width/2.)-sprite._pygame_x(), (mouse.y+screen_height/2.)-sprite._pygame_y()):
                 sprite._is_clicked = True
-                _loop.create_task(sprite._when_clicked_callback())
+
+                # only run sprite clicks on the frame the mouse was clicked
+                if click_happened_this_frame:
+                    for callback in sprite._when_clicked_callbacks:
+                        if not callback.is_running:
+                            _loop.create_task(callback())
 
         _pygame_display.blit(sprite._pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
 
@@ -356,6 +365,7 @@ async def timer(seconds=1):
 async def next_frame():
     await asyncio.sleep(0)
 
+_repeat_forever_callbacks = []
 def repeat_forever(func):
     """
     Calls the given function repeatedly.
@@ -370,10 +380,12 @@ def repeat_forever(func):
 
     """
     async def repeat_wrapper():
+        repeat_wrapper.is_running = True
         await func()
-        asyncio.create_task(repeat_wrapper())
+        repeat_wrapper.is_running = False
 
-    _loop.create_task(repeat_wrapper())
+    repeat_wrapper.is_running = False
+    _repeat_forever_callbacks.append(repeat_wrapper)
     return func
 
 
