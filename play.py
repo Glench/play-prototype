@@ -55,8 +55,7 @@ class sprite(object):
         self.x += steps
 
     def turn(self, degrees=10):
-        self._degrees += degrees
-        self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self._degrees*-1)
+        self.degrees = self.degrees + degrees
 
     @property 
     def degrees(self):
@@ -70,10 +69,9 @@ class sprite(object):
     def point_towards(self, angle):
         if isinstance(angle, sprite) or isinstance(angle, _mouse):
             x, y = angle.x, angle.y
-            self._degrees = math.degrees(math.atan2(y, x))
+            self.degrees = math.degrees(math.atan2(y-self.y, x-self.x))
         else:
-            self._degrees = angle
-        self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self._degrees*-1)
+            self.degrees = angle
 
     def increase_size(self, percent=10):
         self.size += percent
