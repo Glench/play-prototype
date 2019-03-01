@@ -202,6 +202,15 @@ background_color = (255, 255, 255)
 def set_background_color(color):
     global background_color
 
+    # I chose to make set_background_color a function so that we can give
+    # good error messages at the call site if a color isn't recognized.
+    # If we didn't have a function and just set background_color like this:
+    #
+    #       play.background_color = 'gbluereen'
+    #
+    # then any errors resulting from that statement would appear somewhere
+    # deep in this library instead of in the user code.
+
     if type(color) == tuple:
         background_color = color
     else:
