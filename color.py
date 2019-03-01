@@ -9,8 +9,8 @@ color_names = {
 def color_name_to_rgb(name):
     if type(name) == tuple:
         return name
-        
+
     try:
-        return color_names[name]
+        return color_names[name.lower().strip()]
     except KeyError:
-        raise Exception("Color name not recognized: {}".format(name))
+        raise Exception(f"Color name not recognized: '{name}'")

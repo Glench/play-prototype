@@ -9,13 +9,18 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
+#   - properly detect keypresses with shift+key, like !
 #   - implement @when_key_released, @when_any_key_released
 #   - combine rotation/size/transparency image transforms so they work together
 #   - combine font/font size/rotation/size image transforms so they work together
-#   - properly detect keypresses with shift+key, like !
+#   - experiment with box2d
 # boring, easy work:
-#   - add all color names
+#   - add all color names (gray/grey, light blue, dark blue)
 
+@play.repeat_forever
+async def do():
+    if play.is_key_pressed('w', 'up'):
+        print('w or up pressed')
 
 cat.should_rotate = False
 
@@ -34,7 +39,7 @@ async def do(key):
     await play.timer(seconds=1)
     temp_text.words = ''
 
-typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color='white')
+typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color=(255,255,255, .3))
 
 @play.when_any_key_pressed
 async def do(key):
