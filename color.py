@@ -7,4 +7,10 @@ color_names = {
 }
 
 def color_name_to_rgb(name):
-    return color_names[name]
+    if type(name) == tuple:
+        return name
+        
+    try:
+        return color_names[name]
+    except KeyError:
+        raise Exception("Color name not recognized: {}".format(name))

@@ -67,10 +67,10 @@ class sprite(object):
         self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self._degrees*-1)
 
     def point_towards(self, angle):
-        if isinstance(angle, sprite) or isinstance(angle, _mouse):
+        try:
             x, y = angle.x, angle.y
             self.degrees = math.degrees(math.atan2(y-self.y, x-self.x))
-        else:
+        except AttributeError:
             self.degrees = angle
 
     def increase_size(self, percent=10):
@@ -80,12 +80,34 @@ class sprite(object):
             (round(self._pygame_surface_original.get_width() * ratio), round(self._pygame_surface_original.get_height() * ratio)))
 
     def go_to(self, sprite_or_x=None, y=None):
-        if isinstance(sprite_or_x, sprite) or isinstance(sprite_or_x, _mouse):
+        """
+        Example:
+
+            sprite.go_to(play.mouse)
+        """
+        assert(not sprite_or_x is None)
+
+        try:
             self.x = sprite_or_x.x
             self.y = sprite_or_x.y
-        else:
+        except AttributeError:
             self.x = sprite_or_x
             self.y = y 
+
+    def distance_to(self, sprite_or_x=None, y=None):
+        assert(not sprite_or_x is None)
+
+        try:
+            x = sprite_or_x.x
+            y = sprite_or_x.y
+        except AttributeError:
+            x = sprite_or_x
+            y = y
+
+        dx = self.x - x
+        dy = self.y - y
+
+        return math.sqrt(dx**2 + dy**2)
 
 
     @property 
@@ -147,26 +169,21 @@ class text(sprite):
 
     @words.setter
     def words(self, string):
-        self._words = string
+        self._words = str(string)
         self._pygame_surface_original = self._pygame_font.render(self._words, False, (0, 0, 0))
         self._pygame_surface = self._pygame_surface_original
 
 
 
 
-_background_color = (255, 255, 255)
-def background_color(color=None, red_amount=None, green_amount=None, blue_amount=None):
-    global _background_color
-    if not color:
-        _background_color = (
-            max(red_amount*255, 255), 
-            max(green_amount*255, 255),
-            max(blue_amount*255, 255)
-        )
-    elif isinstance(color, tuple):
-        _background_color = color
+background_color = (255, 255, 255)
+def set_background_color(color):
+    global background_color
+
+    if type(color) == tuple:
+        background_color = color
     else:
-        _background_color = color_name_to_rgb(color)
+        background_color = color_name_to_rgb(color)
 
 def when_clicked(sprite):
     def real_decorator(callback):
@@ -271,7 +288,8 @@ def _game_loop():
     # 11. call event loop again
 
 
-    _pygame_display.fill(_background_color)
+
+    _pygame_display.fill(color_name_to_rgb(background_color))
 
     # BACKGROUND COLOR
     # note: cannot use screen.fill((1, 1, 1)) because pygame's screen
@@ -359,7 +377,7 @@ cool stuff to add:
     debug UI for all sprites (bounding box plus values of: x,y,image,size,width,height click state, running commands)
     key pressed
     play.new_rectangle(x=0, y=0, width=100, height=200, color='gray', border_color='red', border_width=1)
-    play.new_circle(x=0, y=0, radius=10, border_width=1, border_color='red')
+    play.new_circle(x=0, y=0, radius=10, color='blue', border_width=1, border_color='red')
     play.new_line(x=0, y=0, x_end=20, y_end=20, color='black')
     ellipse
     collision system (bouncing balls, platformer)
@@ -368,24 +386,22 @@ cool stuff to add:
 
     sprite.glide_to(other_sprite, seconds=1)
     sprite.transparency(0.5)
-    sprite.turn()
     sprite.remove()
     dog.go_to(cat.bottom) # dog.go_to(cat.bottom+5)
     text.font = 'blah', text.font_size = 'blah', text.words = 'blah', all need to have pygame surface recomputed
-    sprite.image = 'blah.png", sprite.size, sprite.angle # change_image / animation system / costume, need to have pygame surface recomputed
+    sprite.image = 'blah.png", sprite.size, sprite.angle, sprite.transparency # change_image / animation system / costume, need to have pygame surface recomputed
     play sound / music
     play.music('jam.mp3', loop=False)
     play.stop_music('jam.mp3')
     play.sound('jam.mp3')
     play.volume = 2
     sprite.clone()
-    sprite.point_to()
-    play.mouse_position()
     sprite.is_touching(cat)
     play.gravity(vertical=1.0, horizontal=0)
     sprite.physics( x_velocity, y_velocity, obeys_gravity=True, bounces_off_walls=True, heaviness=1, bounciness=1.0)
         sprite.physics_off()
         sprite.is_physics_on()
+        box2d is_fixed_rotation good for platformers
     sprite.show()/hide() - sprite.is_shown() sprite.is_hidden()
     sprite.size = 2
     play.background_image('backgrounds/waterfall.png', fit_to_screen=False, x=0,y=0)
@@ -401,7 +417,6 @@ cool stuff to add:
     add images to cache for fast new sprite creation
     figure out how to make fonts look better
 
-    box2d is_fixed_rotation good for platformers
 
 
 [x] how to change background color once every half second?

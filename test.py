@@ -1,19 +1,20 @@
 import play
 
-play.background_color(red_amount=1.0, blue_amount=1.0, green_amount=1.0)
+play.set_background_color((255,255,255))
 
 cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
 
 label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
-key_text = play.new_text(words='last key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='white')
 
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
-#   - fix rotation when not in center of screen
 #   - refactor event loop
-#   - @play.when_any_key_pressed
-#       - properly detect keypresses with shift+key
+#   - implement @when_key_let_go, @when_any_key_let_go
+#   - combine rotation/size/transparency image transforms so they work together
+#   - combine font/font size/rotation/size image transforms so they work together
+#   - allow multiple @cat.when_clicked callbacks
+#   - properly detect keypresses with shift+key, like !
 
 cat.should_rotate = False
 
@@ -57,13 +58,14 @@ async def do(key):
     if key == 'left':
         cat.x -= 20
 
+key_text = play.new_text(words='last key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='white')
+
 @play.when_any_key_pressed
 async def do(key):
     key_text.words = 'last key pressed: {}'.format(key)
 
 @cat.when_clicked
 async def do():
-    print(label.words)
     if cat.size >= 200:
         for number in play.repeat(100):
             cat.increase_size(percent=-1)
@@ -81,6 +83,9 @@ async def do():
     label.go_to(cat)
     if cat.should_rotate:
         cat.point_towards(play.mouse)
+
+        # FIXME: switching the order of these two statements causes the text not to rotate 
+        label.words = cat.distance_to(play.mouse)
         label.degrees = cat.degrees
 
 # cat.should_move_forward = 1
@@ -101,13 +106,13 @@ async def do():
 @play.repeat_forever
 async def do():
 
-    play.background_color('red')
+    play.set_background_color('red')
     await play.timer(seconds=1)
 
-    play.background_color('green')
+    play.set_background_color('green')
     await play.timer(seconds=1)
 
-    play.background_color('blue')
+    play.set_background_color('blue')
     await play.timer(seconds=1)
 
 
