@@ -51,6 +51,11 @@ async def do(key):
 
 key_text = play.new_text(words='keys pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
 
+@play.repeat_forever
+async def do():
+    if play.key_is_pressed('up', 'w'):
+        cat.y -= 10
+
 @play.when_any_key_pressed
 async def do(key):
     key_text.words = f'key pressed: {key}'
@@ -64,9 +69,11 @@ async def do(key):
     # if key == 'left':
     #     cat.x -= 20
 
+temp_text = play.new_text(words=f'{key} pressed!', x=0, y=-150, font='Arial.ttf', font_size=80, color='black')
+
 @play.when_key_pressed('space', 'backspace')
 async def do(key):
-    temp_text = play.new_text(words=f'{key} pressed!', x=0, y=-150, font='Arial.ttf', font_size=80, color='black')
+    temp_text = f'{key} pressed!'
     await play.timer(seconds=1)
     temp_text.words = ''
 

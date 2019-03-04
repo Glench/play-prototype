@@ -263,7 +263,7 @@ def when_key_pressed(*keys):
         return wrapper
     return decorator
 
-def is_key_pressed(*keys):
+def key_is_pressed(*keys):
     """
     Returns True if any of the keys are pressed.
 
@@ -271,7 +271,7 @@ def is_key_pressed(*keys):
 
         @repeat_forever
         async def do():
-            if play.is_key_pressed('up', 'w'):
+            if play.key_is_pressed('up', 'w'):
                 print('up or w pressed')
     """
     for key in keys:
@@ -477,7 +477,6 @@ cool stuff to add:
     sprite.distance_to(cat)    # sprite.distance_to(cat.bottom)
     play.random_position()
     play.random_color()
-    play.is_key_pressed('right') -> True
     sprite.flip(direction='left') sprite.flip(direction='down')
 
     for i in play.seconds(5):
