@@ -19,7 +19,7 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 
 @play.repeat_forever
 async def do():
-    if play.is_key_pressed('w', 'up'):
+    if play.key_is_pressed('w', 'up'):
         print('w or up pressed')
 
 cat.should_rotate = False
@@ -69,11 +69,11 @@ async def do(key):
     # if key == 'left':
     #     cat.x -= 20
 
-temp_text = play.new_text(words=f'{key} pressed!', x=0, y=-150, font='Arial.ttf', font_size=80, color='black')
+temp_text = play.new_text(words=f'', x=0, y=-150, font='Arial.ttf', font_size=80, color='black')
 
 @play.when_key_pressed('space', 'backspace')
 async def do(key):
-    temp_text = f'{key} pressed!'
+    temp_text.words = f'{key} pressed!'
     await play.timer(seconds=1)
     temp_text.words = ''
 
