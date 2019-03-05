@@ -43,6 +43,7 @@ class sprite(object):
         self.size = size
 
         self._is_clicked = False
+        self._is_hidden = False
 
         self._pygame_surface_original = pygame.image.load(os.path.join(image)).convert()
         self._pygame_surface_original.set_colorkey((255,255,255)) # set background to transparent
@@ -69,6 +70,15 @@ class sprite(object):
     def degrees(self, _degrees):
         self._degrees = _degrees
         self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self._degrees*-1)
+
+    def hide(self):
+        self._is_hidden = True
+
+    def show(self):
+        self._is_hidden = False
+
+    def is_hidden(self):
+        return self._is_hidden
 
     def point_towards(self, angle):
         try:
@@ -181,6 +191,7 @@ class text(sprite):
         self._color = color
 
         self._is_clicked = False
+        self._is_hidden = False
 
         self._pygame_font = pygame.font.Font(self.font, self.font_size)
         self._pygame_surface_original = self._pygame_font.render(self._words, False, color_name_to_rgb(self.color))
@@ -361,6 +372,10 @@ def _game_loop():
     # gl.glClear(gl.GL_COLOR_BUFFER_BIT)
 
     for sprite in all_sprites:
+
+        if sprite.is_hidden():
+            print('sprite is hidden, not rendering or doing click events')
+            continue
 
         #################################
         # @sprite.when_clicked events
