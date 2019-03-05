@@ -10,7 +10,6 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
 #   - fix y axis
-#   - implement hide() / show()
 #   - properly detect keypresses with shift+key, like !
 #   - implement @when_key_released, @when_any_key_released
 #   - combine rotation/size/transparency image transforms so they work together
@@ -26,15 +25,16 @@ async def do():
     # await play.timer(seconds=2)
     # label.words = 'click this cat!'
     await play.timer(seconds=2)
-    print('hide')
+    label.words = 'oops, the cat got scared :)'
     cat.hide()
-    await play.timer(seconds=2)
+    await play.timer(seconds=4)
     cat.show()
+    label.words = 'okay, now click the cat'
     cat.should_rotate = True
 
 @cat.when_clicked
 async def do():
-    label.words = 'clicked'
+    label.words = ':3'
     await play.timer(seconds=2)
     label.words = 'click this cat!'
 

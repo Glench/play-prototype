@@ -285,6 +285,11 @@ def key_is_pressed(*keys):
             if play.key_is_pressed('up', 'w'):
                 print('up or w pressed')
     """
+    # Called this function key_is_pressed instead of is_key_pressed so it will
+    # sound more english-like with if-statements:
+    #
+    #   if play.key_is_pressed('w', 'up')
+
     for key in keys:
         if key in pressed_keys:
             return True
@@ -374,7 +379,6 @@ def _game_loop():
     for sprite in all_sprites:
 
         if sprite.is_hidden():
-            print('sprite is hidden, not rendering or doing click events')
             continue
 
         #################################
@@ -522,4 +526,10 @@ principle:
         cat.x += 5
         cat.y = 5
 
+IDE ideas:
+    - add helpful comment about any code appearing below play.start_program() not running. I made this mistake and it was confusing
+    - if pasting in event code (e.g. @play.when_key_pressed async def do(key)), make the indent level all the way to the left
+    - if pasting in sprite code (e.g. is_hidden()), find the last defined sprite and call the method on that
+    - if pasting in awaitable code (e.g. await play.timer(seconds=1.0)), somehow make sure
+    - if possible, always paste full working example code that will do something visible
 """
