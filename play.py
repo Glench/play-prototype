@@ -248,6 +248,9 @@ def when_clicked(*sprites):
         sprite.when_clicked(callback)
     return real_decorator
 
+def when_mouse_clicked(func):
+    mouse.when_clicked(func)
+
 pygame.key.set_repeat(200, 16)
 pressed_keys = set()
 _keypress_callbacks = []

@@ -19,24 +19,19 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - add all color names (gray/grey, light blue, dark blue)
 
 
-@play.when_program_starts
-async def do():
-    # label.words = 'program started!'
-    # await play.timer(seconds=2)
-    # label.words = 'click this cat!'
-    await play.timer(seconds=2)
-    label.words = 'oops, the cat got scared :)'
-    cat.hide()
-    await play.timer(seconds=4)
-    cat.show()
-    label.words = 'okay, now click the cat'
-    cat.should_rotate = True
-
 @cat.when_clicked
 async def do():
     label.words = ':3'
+    label.degrees = 90
+    label.x = -65
+    label.y = -55
+    label.font_size = 100
     await play.timer(seconds=2)
+
     label.words = 'click this cat!'
+    label.x = 0
+    label.y = 0
+    label.degrees = 0
 
 
 typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color=(255,255,255, .3))
