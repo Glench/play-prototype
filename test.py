@@ -1,6 +1,7 @@
 import play
 
 cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
+othercat = play.new_sprite(image='cat.png', x=100, y=200, size=100)
 
 play.set_background_color((255,255,255))
 
@@ -18,20 +19,19 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
 
+# @cat.when_clicked
+# async def do():
+#     label.words = ':3'
+#     label.degrees = 90
+#     label.x = -65
+#     label.y = -55
+#     label.font_size = 100
+#     await play.timer(seconds=2)
 
-@cat.when_clicked
-async def do():
-    label.words = ':3'
-    label.degrees = 90
-    label.x = -65
-    label.y = -55
-    label.font_size = 100
-    await play.timer(seconds=2)
-
-    label.words = 'click this cat!'
-    label.x = 0
-    label.y = 0
-    label.degrees = 0
+#     label.words = 'click this cat!'
+#     label.x = 0
+#     label.y = 0
+#     label.degrees = 0
 
 
 typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color=(255,255,255, .3))

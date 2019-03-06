@@ -147,10 +147,13 @@ class sprite(object):
     def _pygame_y(self):
         return self.y + (screen_height/2.) - (self._pygame_surface.get_height()/2.)
 
-    def when_clicked(self, async_callback):
+    def when_clicked(self, async_callback, call_with_sprite=False):
         async def wrapper():
             wrapper.is_running = True
-            await async_callback()
+            if call_with_sprite:
+                await async_callback(self)
+            else:
+                await async_callback()
             wrapper.is_running = False
         wrapper.is_running = False
         self._when_clicked_callbacks.append(wrapper)
@@ -242,11 +245,12 @@ def set_background_color(color):
     else:
         background_color = color_name_to_rgb(color)
 
-def when_clicked(*sprites):
-    # TODO
-    for sprite in sprites:
-        sprite.when_clicked(callback)
-    return real_decorator
+def when_sprite_clicked(*sprites):
+    def wrapper(func):
+        for sprite in sprites:
+            sprite.when_clicked(func, call_with_sprite=True)
+        return func
+    return wrapper
 
 def when_mouse_clicked(func):
     mouse.when_clicked(func)
