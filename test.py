@@ -20,15 +20,6 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - add all color names (gray/grey, light blue, dark blue)
 
 
-
-# TODO: why doesn't this work?
-@play.repeat_forever
-async def do():
-    if play.sprite_is_clicked(cat):
-        print('hi')
-    if cat.is_clicked():
-        print('isclick')
-
 # @cat.when_clicked
 # async def do():
 #     label.words = ':3'
