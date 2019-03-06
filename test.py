@@ -1,7 +1,6 @@
 import play
 
 cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
-othercat = play.new_sprite(image='cat.png', x=100, y=200, size=100)
 
 play.set_background_color((255,255,255))
 
@@ -16,8 +15,19 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - combine rotation/size/transparency image transforms so they work together
 #   - combine font/font size/rotation/size image transforms so they work together
 #   - experiment with box2d
+#   - figure out why click events on text don't work
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
+
+
+
+# TODO: why doesn't this work?
+@play.repeat_forever
+async def do():
+    if play.sprite_is_clicked(cat):
+        print('hi')
+    if cat.is_clicked():
+        print('isclick')
 
 # @cat.when_clicked
 # async def do():

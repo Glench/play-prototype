@@ -252,6 +252,9 @@ def when_sprite_clicked(*sprites):
         return func
     return wrapper
 
+def sprite_is_clicked(*sprites):
+    return any(sprite.is_clicked() for sprite in sprites)
+
 def when_mouse_clicked(func):
     mouse.when_clicked(func)
 
@@ -385,13 +388,14 @@ def _game_loop():
 
     for sprite in all_sprites:
 
+        sprite._is_clicked = False
+        
         if sprite.is_hidden():
             continue
 
         #################################
         # @sprite.when_clicked events
         #################################
-        sprite._is_clicked = False
         if mouse.is_clicked() and sprite._when_clicked_callbacks:
             # get_rect().collidepoint() is local coordinates, e.g. 100x100 image, so have to translate
             if sprite._pygame_surface.get_rect().collidepoint((mouse.x+screen_width/2.)-sprite._pygame_x(), (mouse.y+screen_height/2.)-sprite._pygame_y()):
