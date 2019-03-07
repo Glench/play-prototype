@@ -135,6 +135,9 @@ keypress_map = {
     pygame.K_EURO: '€',
 }
 
-def pygame_key_to_name(pygame_key):
-    return keypress_map[pygame_key]
+def pygame_key_to_name(pygame_key_event):
+    english_name = keypress_map[pygame_key_event.key]
+    if not pygame_key_event.mod and len(english_name) > 1:
+        return english_name
+    return pygame_key_event.unicode
 

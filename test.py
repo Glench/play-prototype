@@ -7,31 +7,17 @@ play.set_background_color((255,255,255))
 label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
 
-
-cat.clicked = False
-
-@play.repeat_forever
-async def do():
-    if cat.clicked:
-        cat.point_towards(play.mouse)
-
-@cat.when_clicked
-async def do():
-    cat.clicked = True
-
-
 # TODO:
 #   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
 #   - fix y axis
-#   - properly detect keypresses with shift+key, like !
 #   - implement @when_key_released, @when_any_key_released
-#   - experiment with box2d
+#   - experiment with box2d or pymunk
 #   - figure out z-ordering, make sure click events work according to that
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
 
 # @cat.when_clicked
-# @play.when_sprite_clicked(cat) TODO use `inspect` to allow using argument or not: inspect.getfullargspec(aMethod)
+# @play.when_sprite_clicked(cat) TODO use `inspect` to allow using argument or not: inspect.getfullargspec(aMethod): https://stackoverflow.com/questions/218616/getting-method-parameter-names-in-python
 # play.sprite_is_clicked(cat)
 
 # @play.when_mouse_clicked
@@ -43,45 +29,11 @@ async def do():
 # play.mouse.when_click_released
 
 
-# @cat.when_clicked
-# async def do():
-#     label.words = ':3'
-#     label.degrees = 90
-#     label.x = -65
-#     label.y = -55
-#     label.font_size = 100
-#     await play.timer(seconds=2)
+key_text = play.new_text(words='key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
 
-#     label.words = 'click this cat!'
-#     label.x = 0
-#     label.y = 0
-#     label.degrees = 0
-
-
-# typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color=(255,255,255, .3))
-
-# @play.when_any_key_pressed
-# async def do(key):
-#     if key == 'space':
-#         key = ' '
-#     elif key in ['up', 'left', 'down', 'right', 'shift', 'meta', 'super', 'control']:
-#         key = ''
-
-#     if key == 'backspace':
-#         typed_text.words = typed_text.words[:-1]
-#     else:
-#         typed_text.words += key
-
-# key_text = play.new_text(words='keys pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
-
-# @play.repeat_forever
-# async def do():
-#     if play.key_is_pressed('up', 'w'):
-#         cat.y -= 10
-
-# @play.when_any_key_pressed
-# async def do(key):
-#     key_text.words = f'key pressed: {key}'
+@play.when_any_key_pressed
+async def do(key):
+    key_text.words = f'key pressed: {key}'
 
     # if key == 'up':
     #     cat.y -= 20
@@ -91,16 +43,6 @@ async def do():
     #     cat.x += 20
     # if key == 'left':
     #     cat.x -= 20
-
-# temp_text = play.new_text(words=f'', x=0, y=-150, font='Arial.ttf', font_size=80, color='black')
-
-# @play.when_key_pressed('space', 'backspace')
-# async def do(key):
-#     temp_text.words = f'{key} pressed!'
-#     await play.timer(seconds=1)
-#     temp_text.words = ''
-
-
 
 
 # @cat.when_clicked

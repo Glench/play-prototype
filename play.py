@@ -18,6 +18,9 @@ screen_width, screen_height = 800, 600
 _pygame_display = pygame.display.set_mode((screen_width, screen_height), pygame.DOUBLEBUF)
 
 
+class Oops(Exception):
+    pass
+
 all_sprites = []
 
 _debug = True
@@ -323,6 +326,16 @@ pressed_keys = set()
 _keypress_callbacks = []
 
 def when_any_key_pressed(func):
+    if not callable(func):
+        raise Oops("""
+
+@play.when_any_key_pressed doesn't take a list of keys. Try just this instead:
+
+@play.when_any_key_pressed
+async def do(key):
+    print("This key was pressed!", key)
+""")
+
     async def wrapper(*args, **kwargs):
         wrapper.is_running = True
         await func(*args, **kwargs)
@@ -384,10 +397,11 @@ def _game_loop():
         if event.type == pygame.MOUSEMOTION:
             mouse.x, mouse.y = event.pos[0] - screen_width/2., event.pos[1] - screen_height/2.
         if event.type == pygame.KEYDOWN:
-            pressed_keys.add(pygame_key_to_name(event.key))
-            _keys_pressed_this_frame.append(pygame_key_to_name(event.key))
+            pressed_keys.add(pygame_key_to_name(event))
+            _keys_pressed_this_frame.append(pygame_key_to_name(event))
         if event.type == pygame.KEYUP:
-            pressed_keys.remove(pygame_key_to_name(event.key))
+            pass
+            # pressed_keys.remove(pygame_key_to_name(event))
 
 
 
