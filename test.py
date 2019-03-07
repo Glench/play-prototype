@@ -12,8 +12,6 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - fix y axis
 #   - properly detect keypresses with shift+key, like !
 #   - implement @when_key_released, @when_any_key_released
-#   - combine rotation/size/transparency image transforms so they work together
-#   - combine font/font size/rotation/size image transforms so they work together
 #   - experiment with box2d
 #   - figure out why click events on text don't work
 # boring, easy work:
@@ -101,7 +99,6 @@ async def do():
 
     if cat.size >= 200:
         for number in play.repeat(100):
-            label.words = number
             cat.size -= 1
             label.size -= 1
             await play.next_frame()

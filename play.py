@@ -281,8 +281,8 @@ class text(sprite):
         return self._color
 
     @color.setter
-    def set_color(self, color):
-        self._color = color
+    def color(self, color_):
+        self._color = color_
         self._should_recompute_primary_surface = True
 
 
