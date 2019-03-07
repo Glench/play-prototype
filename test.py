@@ -1,6 +1,6 @@
 import play
 
-cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
+# cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
 
 play.set_background_color((255,255,255))
 
@@ -13,10 +13,9 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - properly detect keypresses with shift+key, like !
 #   - implement @when_key_released, @when_any_key_released
 #   - experiment with box2d
-#   - figure out why click events on text don't work
+#   - figure out z-ordering, make sure click events work according to that
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
-
 
 # @cat.when_clicked
 # @play.when_sprite_clicked(cat) TODO use `inspect` to allow using argument or not: inspect.getfullargspec(aMethod)
@@ -88,28 +87,23 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 
 
 
-@play.repeat_forever
-async def do():
-    label.point_towards(play.mouse)
-    cat.point_towards(play.mouse)
+# @cat.when_clicked
+# async def do():
+#     label.words = 'cat clicked! :3'
 
-@cat.when_clicked
-async def do():
-    label.words = 'cat clicked! :3'
+#     if cat.size >= 200:
+#         for number in play.repeat(100):
+#             cat.size -= 1
+#             label.size -= 1
+#             await play.next_frame()
+#     else:
+#         for number in play.repeat(100):
+#             label.words = number
+#             cat.size += 1
+#             label.size += 1
+#             await play.next_frame()
 
-    if cat.size >= 200:
-        for number in play.repeat(100):
-            cat.size -= 1
-            label.size -= 1
-            await play.next_frame()
-    else:
-        for number in play.repeat(100):
-            label.words = number
-            cat.size += 1
-            label.size += 1
-            await play.next_frame()
-
-    label.words = ''
+#     label.words = ''
 
 # @play.repeat_forever
 # async def do():

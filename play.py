@@ -46,9 +46,6 @@ class sprite(object):
         self._is_hidden = False
 
         self._compute_primary_surface()
-        self._compute_secondary_surface()
-        self._should_recompute_primary_surface = False
-        self._should_recompute_secondary_surface = False
 
         self._when_clicked_callbacks = []
 
@@ -59,8 +56,10 @@ class sprite(object):
         self._primary_pygame_surface.set_colorkey((255,255,255)) # set background to transparent
         self._should_recompute_primary_surface = False
 
-    def _compute_secondary_surface(self):
-        if self._size == 100 and self._degrees == 0:
+        self._compute_secondary_surface(force=True)
+
+    def _compute_secondary_surface(self, force=False):
+        if not force and self._size == 100 and self._degrees == 0:
             self._secondary_pygame_surface = self._primary_pygame_surface
             self._should_recompute_secondary_surface = False
             return
@@ -238,7 +237,6 @@ class text(sprite):
         self._is_hidden = False
 
         self._compute_primary_surface()
-        self._compute_secondary_surface()
 
         self._when_clicked_callbacks = []
 
@@ -248,6 +246,8 @@ class text(sprite):
         self._pygame_font = pygame.font.Font(self._font, self._font_size)
         self._primary_pygame_surface = self._pygame_font.render(self._words, True, color_name_to_rgb(self._color))
         self._should_recompute_primary_surface = False
+
+        self._compute_secondary_surface(force=True)
 
     @property
     def words(self):
@@ -365,12 +365,6 @@ def key_is_pressed(*keys):
             return True
     return False
 
-def _play_x_to_pygame_x(sprite):
-    return sprite.x + (width/2.) - (sprite._pygame_surface.get_width()/2.)
-
-def _play_y_to_pygame_y(sprite):
-    return sprite.y + (height/2.) - (sprite._pygame_surface.get_height()/2.)
-
 _loop = asyncio.get_event_loop()
 _loop.set_debug(True)
 
@@ -453,11 +447,6 @@ def _game_loop():
         if sprite.is_hidden():
             continue
 
-        # do sprite image transforms (re-rendering images/fonts, scaling, rotating, etc)
-        if sprite._should_recompute_primary_surface:
-            sprite._compute_primary_surface()
-        if sprite._should_recompute_secondary_surface:
-            sprite._compute_secondary_surface()
 
         #################################
         # @sprite.when_clicked events
@@ -472,6 +461,16 @@ def _game_loop():
                     for callback in sprite._when_clicked_callbacks:
                         if not callback.is_running:
                             _loop.create_task(callback())
+
+
+        # do sprite image transforms (re-rendering images/fonts, scaling, rotating, etc)
+
+        # we put it in the event loop instead of just recomputing because if we do it
+        # synchronously then the data and rendered image may get out of sync
+        if sprite._should_recompute_primary_surface:
+            _loop.call_soon(sprite._compute_primary_surface)
+        if sprite._should_recompute_secondary_surface:
+            _loop.call_soon(sprite._compute_secondary_surface)
 
         _pygame_display.blit(sprite._secondary_pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
 
