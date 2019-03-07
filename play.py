@@ -322,7 +322,7 @@ def when_mouse_clicked(func):
     mouse.when_clicked(func)
 
 pygame.key.set_repeat(200, 16)
-pressed_keys = set()
+_pressed_keys = {}
 _keypress_callbacks = []
 
 def when_any_key_pressed(func):
@@ -374,7 +374,7 @@ def key_is_pressed(*keys):
     #   if play.key_is_pressed('w', 'up')
 
     for key in keys:
-        if key in pressed_keys:
+        if key in _pressed_keys.itervalues():
             return True
     return False
 
@@ -397,11 +397,10 @@ def _game_loop():
         if event.type == pygame.MOUSEMOTION:
             mouse.x, mouse.y = event.pos[0] - screen_width/2., event.pos[1] - screen_height/2.
         if event.type == pygame.KEYDOWN:
-            pressed_keys.add(pygame_key_to_name(event))
+            _pressed_keys[event.key] = pygame_key_to_name(event)
             _keys_pressed_this_frame.append(pygame_key_to_name(event))
         if event.type == pygame.KEYUP:
-            pass
-            # pressed_keys.remove(pygame_key_to_name(event))
+            del _pressed_keys[event.key]
 
 
 
