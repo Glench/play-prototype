@@ -1,10 +1,23 @@
 import play
 
-# cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
+cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
 
 play.set_background_color((255,255,255))
 
 label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
+
+
+
+cat.clicked = False
+
+@play.repeat_forever
+async def do():
+    if cat.clicked:
+        cat.point_towards(play.mouse)
+
+@cat.when_clicked
+async def do():
+    cat.clicked = True
 
 
 # TODO:
@@ -25,6 +38,9 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 # @play.mouse.when_clicked
 # play.mouse_is_clicked()
 # play.mouse.is_clicked()
+
+# @sprite.when_click_released
+# play.mouse.when_click_released
 
 
 # @cat.when_clicked
