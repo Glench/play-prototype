@@ -31,27 +31,51 @@ def debug(on_or_off):
 def random_number(lowest=0, highest=100):
     return random.randint(lowest, highest)
 
-def new_sprite(image='cat.png', x=0, y=0, size=100):
-    return sprite(image=image, x=x, y=0, size=size)
+def new_sprite(image='cat.png', x=0, y=0, size=100, degrees=0):
+    return sprite(image=image, x=x, y=0, size=size, degrees=0)
 
 class sprite(object):
-    def __init__(self, image='cat.png', x=0, y=0, size=100):
-        self.image = image
+    def __init__(self, image='cat.png', x=0, y=0, size=100, degrees=0):
+        self._image = image
         self.x = x
         self.y = y
-        self._degrees = 0
-        self.size = size
+        self._degrees = degrees
+        self._size = size
 
         self._is_clicked = False
         self._is_hidden = False
 
-        self._pygame_surface_original = pygame.image.load(os.path.join(image)).convert()
-        self._pygame_surface_original.set_colorkey((255,255,255)) # set background to transparent
-        self._pygame_surface = self._pygame_surface_original
+        self._compute_primary_surface()
+        self._compute_secondary_surface()
+        self._should_recompute_primary_surface = False
+        self._should_recompute_secondary_surface = False
 
         self._when_clicked_callbacks = []
 
         all_sprites.append(self)
+
+    def _compute_primary_surface(self):
+        self._primary_pygame_surface = pygame.image.load(os.path.join(self._image)).convert()
+        self._primary_pygame_surface.set_colorkey((255,255,255)) # set background to transparent
+        self._should_recompute_primary_surface = False
+
+    def _compute_secondary_surface(self):
+        if self._size == 100 and self._degrees == 0:
+            self._secondary_pygame_surface = self._primary_pygame_surface
+            self._should_recompute_secondary_surface = False
+            return
+
+        ratio = self.size/100.
+
+        # scale and then rotate
+        self._secondary_pygame_surface = pygame.transform.rotate(
+            pygame.transform.scale(
+                self._primary_pygame_surface,
+                (round(self._primary_pygame_surface.get_width() * ratio),    # width
+                 round(self._primary_pygame_surface.get_height() * ratio)))  # height
+        , self._degrees*-1)
+        self._should_recompute_secondary_surface = False
+
 
     def is_clicked(self):
         return self._is_clicked
@@ -63,13 +87,31 @@ class sprite(object):
         self.degrees = self.degrees + degrees
 
     @property 
+    def image(self):
+        return self._image
+
+    @image.setter
+    def image(self, image_filename):
+        self._image = image_filename
+        self._should_recompute_primary_surface = True
+
+    @property 
     def degrees(self):
         return self._degrees
 
     @degrees.setter
     def degrees(self, _degrees):
         self._degrees = _degrees
-        self._pygame_surface = pygame.transform.rotate(self._pygame_surface_original, self._degrees*-1)
+        self._should_recompute_secondary_surface = True
+
+    @property 
+    def size(self):
+        return self._size
+
+    @size.setter
+    def size(self, percent):
+        self._size = percent
+        self._should_recompute_secondary_surface = True
 
     def hide(self):
         self._is_hidden = True
@@ -88,10 +130,8 @@ class sprite(object):
             self.degrees = angle
 
     def increase_size(self, percent=10):
-        self.size += percent
-        ratio = self.size/100.
-        self._pygame_surface = pygame.transform.scale(self._pygame_surface_original,
-            (round(self._pygame_surface_original.get_width() * ratio), round(self._pygame_surface_original.get_height() * ratio)))
+        self._size += percent
+        self._should_recompute_secondary_surface = True
 
     def go_to(self, sprite_or_x=None, y=None):
         """
@@ -131,21 +171,21 @@ class sprite(object):
 
     @property 
     def width(self):
-        return self._pygame_surface.get_width()
+        return self._secondary_pygame_surface.get_width()
 
     @property 
     def height(self):
-        return self._pygame_surface.get_height()
+        return self._secondary_pygame_surface.get_height()
 
     @property 
     def right(self):
         return self.x + self.width/2.
 
     def _pygame_x(self):
-        return self.x + (screen_width/2.) - (self._pygame_surface.get_width()/2.)
+        return self.x + (screen_width/2.) - (self._secondary_pygame_surface.get_width()/2.)
 
     def _pygame_y(self):
-        return self.y + (screen_height/2.) - (self._pygame_surface.get_height()/2.)
+        return self.y + (screen_height/2.) - (self._secondary_pygame_surface.get_height()/2.)
 
     def when_clicked(self, async_callback, call_with_sprite=False):
         async def wrapper():
@@ -180,29 +220,34 @@ class _mouse(object):
 
 mouse = _mouse()
 
-def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, color='black'):
-    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color)
+def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, color='black', degrees=0):
+    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color, degrees=0)
 
 class text(sprite):
-    def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=100, color='black'):
+    def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=100, color='black', degrees=0):
         self._words = words
         self.x = x
         self.y = y
-        self.font = font
-        self.font_size = font_size
-        self.size = size
+        self._font = font
+        self._font_size = font_size
         self._color = color
+        self._size = size
+        self._degrees = degrees
 
         self._is_clicked = False
         self._is_hidden = False
 
-        self._pygame_font = pygame.font.Font(self.font, self.font_size)
-        self._pygame_surface_original = self._pygame_font.render(self._words, False, color_name_to_rgb(self.color))
-        self._pygame_surface = self._pygame_surface_original
+        self._compute_primary_surface()
+        self._compute_secondary_surface()
 
         self._when_clicked_callbacks = []
 
         all_sprites.append(self)
+
+    def _compute_primary_surface(self):
+        self._pygame_font = pygame.font.Font(self._font, self._font_size)
+        self._primary_pygame_surface = self._pygame_font.render(self._words, True, color_name_to_rgb(self._color))
+        self._should_recompute_primary_surface = False
 
     @property
     def words(self):
@@ -211,8 +256,25 @@ class text(sprite):
     @words.setter
     def words(self, string):
         self._words = str(string)
-        self._pygame_surface_original = self._pygame_font.render(self._words, False, color_name_to_rgb(self.color))
-        self._pygame_surface = self._pygame_surface_original
+        self._should_recompute_primary_surface = True
+
+    @property
+    def font(self):
+        return self._font
+
+    @font.setter
+    def font(self, font_name):
+        self._font = str(font_name)
+        self._should_recompute_primary_surface = True
+
+    @property
+    def font_size(self):
+        return self._font_size
+
+    @font.setter
+    def font_size(self, size):
+        self._font_size = size
+        self._should_recompute_primary_surface = True
 
     @property 
     def color(self):
@@ -221,9 +283,7 @@ class text(sprite):
     @color.setter
     def set_color(self, color):
         self._color = color
-        self._pygame_surface_original = self._pygame_font.render(self._words, False, color_name_to_rgb(self.color))
-        self._pygame_surface = self._pygame_surface_original
-
+        self._should_recompute_primary_surface = True
 
 
 
@@ -393,12 +453,18 @@ def _game_loop():
         if sprite.is_hidden():
             continue
 
+        # do sprite image transforms (re-rendering images/fonts, scaling, rotating, etc)
+        if sprite._should_recompute_primary_surface:
+            sprite._compute_primary_surface()
+        if sprite._should_recompute_secondary_surface:
+            sprite._compute_secondary_surface()
+
         #################################
         # @sprite.when_clicked events
         #################################
         if mouse.is_clicked():
             # get_rect().collidepoint() is local coordinates, e.g. 100x100 image, so have to translate
-            if sprite._pygame_surface.get_rect().collidepoint((mouse.x+screen_width/2.)-sprite._pygame_x(), (mouse.y+screen_height/2.)-sprite._pygame_y()):
+            if sprite._secondary_pygame_surface.get_rect().collidepoint((mouse.x+screen_width/2.)-sprite._pygame_x(), (mouse.y+screen_height/2.)-sprite._pygame_y()):
                 sprite._is_clicked = True
 
                 # only run sprite clicks on the frame the mouse was clicked
@@ -407,7 +473,7 @@ def _game_loop():
                         if not callback.is_running:
                             _loop.create_task(callback())
 
-        _pygame_display.blit(sprite._pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
+        _pygame_display.blit(sprite._secondary_pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
 
     pygame.display.flip()
     _loop.call_soon(_game_loop)

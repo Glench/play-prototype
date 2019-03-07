@@ -21,6 +21,16 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 
 
 # @cat.when_clicked
+# @play.when_sprite_clicked(cat) TODO use `inspect` to allow using argument or not: inspect.getfullargspec(aMethod)
+# play.sprite_is_clicked(cat)
+
+# @play.when_mouse_clicked
+# @play.mouse.when_clicked
+# play.mouse_is_clicked()
+# play.mouse.is_clicked()
+
+
+# @cat.when_clicked
 # async def do():
 #     label.words = ':3'
 #     label.degrees = 90
@@ -35,19 +45,19 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #     label.degrees = 0
 
 
-typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color=(255,255,255, .3))
+# typed_text = play.new_text(words='', x=-200, y=200, font='Arial.ttf', font_size=20, color=(255,255,255, .3))
 
-@play.when_any_key_pressed
-async def do(key):
-    if key == 'space':
-        key = ' '
-    elif key in ['up', 'left', 'down', 'right', 'shift', 'meta', 'super', 'control']:
-        key = ''
+# @play.when_any_key_pressed
+# async def do(key):
+#     if key == 'space':
+#         key = ' '
+#     elif key in ['up', 'left', 'down', 'right', 'shift', 'meta', 'super', 'control']:
+#         key = ''
 
-    if key == 'backspace':
-        typed_text.words = typed_text.words[:-1]
-    else:
-        typed_text.words += key
+#     if key == 'backspace':
+#         typed_text.words = typed_text.words[:-1]
+#     else:
+#         typed_text.words += key
 
 # key_text = play.new_text(words='keys pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
 
@@ -80,24 +90,29 @@ async def do(key):
 
 
 
-# @cat.when_clicked
-# async def do():
-#     label.words = 'cat clicked! :3'
-#     await play.timer(seconds=2)
-#     label.words = ''
+@play.repeat_forever
+async def do():
+    label.point_towards(play.mouse)
+    cat.point_towards(play.mouse)
 
-#     return 
-#     if cat.size >= 200:
-#         for number in play.repeat(100):
-#             cat.increase_size(percent=-1)
-#             label.increase_size(percent=-1)
-#             await play.next_frame()
-#     else:
-#         for number in play.repeat(100):
-#             cat.increase_size(percent=1)
-#             label.increase_size(percent=1)
-#             await play.next_frame()
-#             # cat.turn(3)
+@cat.when_clicked
+async def do():
+    label.words = 'cat clicked! :3'
+
+    if cat.size >= 200:
+        for number in play.repeat(100):
+            label.words = number
+            cat.size -= 1
+            label.size -= 1
+            await play.next_frame()
+    else:
+        for number in play.repeat(100):
+            label.words = number
+            cat.size += 1
+            label.size += 1
+            await play.next_frame()
+
+    label.words = ''
 
 # @play.repeat_forever
 # async def do():
@@ -106,10 +121,6 @@ async def do(key):
 
 # label.words = ''
 
-# @play.repeat_forever
-# async def do():
-#     return
-#     cat.point_towards(play.mouse)
 
 #     label.go_to(cat)
 
