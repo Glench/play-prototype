@@ -1,6 +1,7 @@
 import play
 
-cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
+cat = play.new_sprite(image='cat.png', x=0, y=0, size=100, transparency=50)
+cat2 = play.new_sprite(image='cat.png', x=100, y=100, size=100, transparency=50)
 
 label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
@@ -15,6 +16,7 @@ label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=20, co
 #   - play.new_circle(x=0, y=0, radius=10, color='blue', border_width=1, border_color='red')
 #   - play.new_line(x=0, y=0, x_end=20, y_end=20, color='black')
 #   - figure out transparency on text not working
+#   - figure out why transparency in constructor isn't working
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
 
@@ -36,19 +38,21 @@ async def do():
 
 @cat.when_clicked
 async def do():
+    cat.transparency = 50
+    cat2.transparency = 50
     label.words = 'clicked'
     for number in play.repeat(100):
         cat.size += 1
         await play.animate()
 
-@play.repeat_forever
-async def do():
-    play.set_background_color('blue')
-    await play.timer(seconds=1)
-    play.set_background_color('green')
-    await play.timer(seconds=1)
-    play.set_background_color('red')
-    await play.timer(seconds=1)
+# @play.repeat_forever
+# async def do():
+#     play.set_background_color('blue')
+#     await play.timer(seconds=1)
+#     play.set_background_color('green')
+#     await play.timer(seconds=1)
+#     play.set_background_color('red')
+#     await play.timer(seconds=1)
 
 
 

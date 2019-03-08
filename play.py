@@ -34,8 +34,8 @@ def debug(on_or_off):
 def random_number(lowest=0, highest=100):
     return random.randint(lowest, highest)
 
-def new_sprite(image='cat.png', x=0, y=0, size=100, degrees=0):
-    return sprite(image=image, x=x, y=0, size=size, degrees=0)
+def new_sprite(image='cat.png', x=0, y=0, size=100, degrees=0, transparency=100):
+    return sprite(image=image, x=x, y=0, size=size, degrees=0, transparency=100)
 
 class sprite(object):
     def __init__(self, image='cat.png', x=0, y=0, size=100, degrees=0, transparency=100):
@@ -44,7 +44,7 @@ class sprite(object):
         self.y = y
         self._degrees = degrees
         self._size = size
-        self._transparency = round((transparency/100.) * 255)
+        self._transparency = transparency
 
         self._is_clicked = False
         self._is_hidden = False
@@ -66,6 +66,7 @@ class sprite(object):
     def _compute_secondary_surface(self, force=False):
         if not force and self._size == 100 and self._degrees == 0 and self._transparency == 255:
             self._secondary_pygame_surface = self._primary_pygame_surface
+            self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
             self._should_recompute_secondary_surface = False
             return
 
@@ -78,7 +79,7 @@ class sprite(object):
                 (round(self._primary_pygame_surface.get_width() * ratio),    # width
                  round(self._primary_pygame_surface.get_height() * ratio)))  # height
         , self._degrees*-1)
-        self._secondary_pygame_surface.set_alpha(self._transparency)
+        self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
         self._should_recompute_secondary_surface = False
 
     def is_clicked(self):
@@ -96,7 +97,8 @@ class sprite(object):
 
     @transparency.setter
     def transparency(self, alpha):
-        self._transparency = round( (alpha/100.) * 255)
+        # alpha is between 0 and 100
+        self._transparency = alpha
         self._should_recompute_secondary_surface = True
 
     @property 
