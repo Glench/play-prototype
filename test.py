@@ -2,7 +2,7 @@ import play
 
 cat = play.new_sprite(image='cat.png', x=0, y=0, size=100)
 
-label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
+label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
 
 
 # TODO:
@@ -11,6 +11,10 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 #   - implement @when_key_released, @when_any_key_released
 #   - experiment with box2d or pymunk
 #   - figure out z-ordering, make sure click events work according to that
+#   - play.new_rectangle(x=0, y=0, width=100, height=200, color='gray', border_color='red', border_width=1)
+#   - play.new_circle(x=0, y=0, radius=10, color='blue', border_width=1, border_color='red')
+#   - play.new_line(x=0, y=0, x_end=20, y_end=20, color='black')
+#   - figure out transparency on text not working
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
 
@@ -26,12 +30,42 @@ label = play.new_text(words='click this cat!', x=0, y=0, font='Arial.ttf', font_
 # @sprite.when_click_released
 # play.mouse.when_click_released
 
+@play.repeat_forever
+async def do():
+    cat.point_towards(play.mouse)
 
-key_text = play.new_text(words='key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
+@cat.when_clicked
+async def do():
+    label.words = 'clicked'
+    for number in play.repeat(100):
+        cat.size += 1
+        await play.animate()
 
-@play.when_any_key_pressed
-async def do(key):
-    key_text.words = f'key pressed: {key}'
+@play.repeat_forever
+async def do():
+    play.set_background_color('blue')
+    await play.timer(seconds=1)
+    play.set_background_color('green')
+    await play.timer(seconds=1)
+    play.set_background_color('red')
+    await play.timer(seconds=1)
+
+
+
+# @play.when_program_starts
+# async def do():
+#     await play.timer(seconds=1)
+#     cat.transparency = 50
+#     await play.timer(seconds=1)
+#     cat.transparency = 100
+#     label.transparency = 0
+
+
+# key_text = play.new_text(words='key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
+
+# @play.when_any_key_pressed
+# async def do(key):
+#     key_text.words = f'key pressed: {key}'
 
     # if key == 'up':
     #     cat.y -= 20

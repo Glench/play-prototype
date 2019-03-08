@@ -38,15 +38,17 @@ def new_sprite(image='cat.png', x=0, y=0, size=100, degrees=0):
     return sprite(image=image, x=x, y=0, size=size, degrees=0)
 
 class sprite(object):
-    def __init__(self, image='cat.png', x=0, y=0, size=100, degrees=0):
+    def __init__(self, image='cat.png', x=0, y=0, size=100, degrees=0, transparency=100):
         self._image = image
         self.x = x
         self.y = y
         self._degrees = degrees
         self._size = size
+        self._transparency = round((transparency/100.) * 255)
 
         self._is_clicked = False
         self._is_hidden = False
+
 
         self._compute_primary_surface()
 
@@ -62,7 +64,7 @@ class sprite(object):
         self._compute_secondary_surface(force=True)
 
     def _compute_secondary_surface(self, force=False):
-        if not force and self._size == 100 and self._degrees == 0:
+        if not force and self._size == 100 and self._degrees == 0 and self._transparency == 255:
             self._secondary_pygame_surface = self._primary_pygame_surface
             self._should_recompute_secondary_surface = False
             return
@@ -76,8 +78,8 @@ class sprite(object):
                 (round(self._primary_pygame_surface.get_width() * ratio),    # width
                  round(self._primary_pygame_surface.get_height() * ratio)))  # height
         , self._degrees*-1)
+        self._secondary_pygame_surface.set_alpha(self._transparency)
         self._should_recompute_secondary_surface = False
-
 
     def is_clicked(self):
         return self._is_clicked
@@ -87,6 +89,15 @@ class sprite(object):
 
     def turn(self, degrees=10):
         self.degrees = self.degrees + degrees
+
+    @property 
+    def transparency(self):
+        return self._transparency
+
+    @transparency.setter
+    def transparency(self, alpha):
+        self._transparency = round( (alpha/100.) * 255)
+        self._should_recompute_secondary_surface = True
 
     @property 
     def image(self):
@@ -123,6 +134,9 @@ class sprite(object):
 
     def is_hidden(self):
         return self._is_hidden
+
+    def is_shown(self):
+        return not self._is_hidden
 
     def point_towards(self, angle):
         try:
@@ -222,11 +236,11 @@ class _mouse(object):
 
 mouse = _mouse()
 
-def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, color='black', degrees=0):
-    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color, degrees=0)
+def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, color='black', degrees=0, transparency=100):
+    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color, degrees=0, transparency=100)
 
 class text(sprite):
-    def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=100, color='black', degrees=0):
+    def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=100, color='black', degrees=0, transparency=100):
         self._words = words
         self.x = x
         self.y = y
@@ -235,6 +249,7 @@ class text(sprite):
         self._color = color
         self._size = size
         self._degrees = degrees
+        self._transparency = transparency
 
         self._is_clicked = False
         self._is_hidden = False
@@ -496,7 +511,7 @@ async def timer(seconds=1):
     await asyncio.sleep(seconds)
     return True
 
-async def next_frame():
+async def animate():
     await asyncio.sleep(0)
 
 _repeat_forever_callbacks = []
@@ -551,22 +566,16 @@ cool stuff to add:
     mouse move
     mouse hover
     mouse hold
-    debug UI for all sprites (bounding box plus values of: x,y,image,size,width,height click state, running commands)
-    key pressed
-    play.new_rectangle(x=0, y=0, width=100, height=200, color='gray', border_color='red', border_width=1)
-    play.new_circle(x=0, y=0, radius=10, color='blue', border_width=1, border_color='red')
-    play.new_line(x=0, y=0, x_end=20, y_end=20, color='black')
+    debug UI for all sprites (bounding box plus values of: x,y,image,size,width,height click state, running commands, mouse coordinates)
     ellipse
     collision system (bouncing balls, platformer)
-    play.mouse.is_touching() # cat.go_to(play.mouse)
+    play.mouse.is_touching()
     @sprite.when_touched
 
     sprite.glide_to(other_sprite, seconds=1)
-    sprite.transparency(0.5)
+    sprite.transparency = 0.5
     sprite.remove()
     dog.go_to(cat.bottom) # dog.go_to(cat.bottom+5)
-    text.font = 'blah', text.font_size = 'blah', text.words = 'blah', all need to have pygame surface recomputed
-    sprite.image = 'blah.png", sprite.size, sprite.angle, sprite.transparency # change_image / animation system / costume, need to have pygame surface recomputed
     play sound / music
     play.music('jam.mp3', loop=False)
     play.stop_music('jam.mp3')
@@ -579,19 +588,16 @@ cool stuff to add:
         sprite.physics_off()
         sprite.is_physics_on()
         box2d is_fixed_rotation good for platformers
-    sprite.show()/hide() - sprite.is_shown() sprite.is_hidden()
     sprite.size = 2
     play.background_image('backgrounds/waterfall.png', fit_to_screen=False, x=0,y=0)
-    sprite.distance_to(cat)    # sprite.distance_to(cat.bottom)
     play.random_position()
     play.random_color()
-    sprite.flip(direction='left') sprite.flip(direction='down')
+    sprite.flip(direction='left-right') sprite.flip(direction='up-down')
+    sprite.flip(left_right=True, up_down=False)
 
-    for i in play.seconds(5):
-        # loop repeatedly for 5 seconds?
+    text.wrapping = True
 
-    add images to cache for fast new sprite creation
-    figure out how to make fonts look better
+    add pygame images to cache for fast new sprite creation (reuse image.png, font)
 
 
 
