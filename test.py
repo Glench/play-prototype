@@ -3,7 +3,7 @@ import play
 play.set_background_color('black')
 
 cat = play.new_sprite(image='cat.png', x=0, y=0, size=100, transparency=100)
-cat = play.new_sprite(image='alien.png', x=0, y=0, size=100, transparency=100)
+alien = play.new_sprite(image='alien.png', x=0, y=0, size=100, transparency=100)
 
 label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, color='blue', transparency=50)
 
@@ -35,10 +35,11 @@ label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, c
 
 @play.repeat_forever
 async def do():
-    cat.x = play.mouse.x
-    cat.y = play.mouse.y
+    alien.x = play.mouse.x
+    alien.y = play.mouse.y
 
-    # cat.point_towards(play.mouse)
+    cat.transparency = 50
+    cat.point_towards(play.mouse)
 
 @cat.when_clicked
 async def do():

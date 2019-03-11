@@ -57,7 +57,7 @@ class sprite(object):
         all_sprites.append(self)
 
     def _compute_primary_surface(self):
-        self._primary_pygame_surface = pygame.image.load(os.path.join(self._image)).convert()
+        self._primary_pygame_surface = pygame.image.load(os.path.join(self._image))
         self._primary_pygame_surface.set_colorkey((255,255,255)) # set background to transparent
         self._should_recompute_primary_surface = False
 
@@ -67,6 +67,7 @@ class sprite(object):
         if not force and (self._size == 100 and self._degrees == 0 and self._transparency == 100):
             self._secondary_pygame_surface = self._primary_pygame_surface
             self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
+            self._secondary_pygame_surface = self._secondary_pygame_surface.convert_alpha()
             self._should_recompute_secondary_surface = False
             return
 
@@ -80,6 +81,7 @@ class sprite(object):
                  round(self._primary_pygame_surface.get_height() * ratio)))  # height
         , self._degrees*-1)
         self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
+        self._secondary_pygame_surface = self._secondary_pygame_surface.convert_alpha()
         self._should_recompute_secondary_surface = False
 
     def is_clicked(self):
