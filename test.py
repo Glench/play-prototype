@@ -1,9 +1,11 @@
 import play
 
-cat = play.new_sprite(image='cat.png', x=0, y=0, size=100, transparency=50)
-cat2 = play.new_sprite(image='cat.png', x=100, y=100, size=100, transparency=50)
+play.set_background_color('black')
 
-label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=20, color='black')
+cat = play.new_sprite(image='cat.png', x=0, y=0, size=100, transparency=100)
+cat = play.new_sprite(image='alien.png', x=0, y=0, size=100, transparency=100)
+
+label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, color='blue', transparency=50)
 
 
 # TODO:
@@ -15,8 +17,7 @@ label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=20, co
 #   - play.new_rectangle(x=0, y=0, width=100, height=200, color='gray', border_color='red', border_width=1)
 #   - play.new_circle(x=0, y=0, radius=10, color='blue', border_width=1, border_color='red')
 #   - play.new_line(x=0, y=0, x_end=20, y_end=20, color='black')
-#   - figure out transparency on text not working
-#   - figure out why transparency in constructor isn't working
+#   - redo transparency like pygame zero: https://pygame-zero.readthedocs.io/en/stable/ptext.html
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
 
@@ -34,12 +35,13 @@ label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=20, co
 
 @play.repeat_forever
 async def do():
-    cat.point_towards(play.mouse)
+    cat.x = play.mouse.x
+    cat.y = play.mouse.y
+
+    # cat.point_towards(play.mouse)
 
 @cat.when_clicked
 async def do():
-    cat.transparency = 50
-    cat2.transparency = 50
     label.words = 'clicked'
     for number in play.repeat(100):
         cat.size += 1

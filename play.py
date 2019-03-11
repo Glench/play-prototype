@@ -35,7 +35,7 @@ def random_number(lowest=0, highest=100):
     return random.randint(lowest, highest)
 
 def new_sprite(image='cat.png', x=0, y=0, size=100, degrees=0, transparency=100):
-    return sprite(image=image, x=x, y=0, size=size, degrees=0, transparency=100)
+    return sprite(image=image, x=x, y=y, size=size, degrees=degrees, transparency=transparency)
 
 class sprite(object):
     def __init__(self, image='cat.png', x=0, y=0, size=100, degrees=0, transparency=100):
@@ -64,7 +64,7 @@ class sprite(object):
         self._compute_secondary_surface(force=True)
 
     def _compute_secondary_surface(self, force=False):
-        if not force and self._size == 100 and self._degrees == 0 and self._transparency == 255:
+        if not force and (self._size == 100 and self._degrees == 0 and self._transparency == 100):
             self._secondary_pygame_surface = self._primary_pygame_surface
             self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
             self._should_recompute_secondary_surface = False
@@ -239,7 +239,7 @@ class _mouse(object):
 mouse = _mouse()
 
 def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, color='black', degrees=0, transparency=100):
-    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color, degrees=0, transparency=100)
+    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color, degrees=degrees, transparency=transparency)
 
 class text(sprite):
     def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=100, color='black', degrees=0, transparency=100):
@@ -265,6 +265,7 @@ class text(sprite):
     def _compute_primary_surface(self):
         self._pygame_font = pygame.font.Font(self._font, self._font_size)
         self._primary_pygame_surface = self._pygame_font.render(self._words, True, color_name_to_rgb(self._color))
+        self._primary_pygame_surface.set_colorkey((255,255,255)) # set background to transparent
         self._should_recompute_primary_surface = False
 
         self._compute_secondary_surface(force=True)
