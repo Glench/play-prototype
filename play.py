@@ -83,31 +83,32 @@ class sprite(object):
         self._compute_secondary_surface(force=True)
 
     def _compute_secondary_surface(self, force=False):
-        if not force and (self._size == 100 and self._degrees == 0 and self._transparency == 100):
-            self._secondary_pygame_surface = self._primary_pygame_surface.copy()
-            self._should_recompute_secondary_surface = False
-            return
 
         self._secondary_pygame_surface = self._primary_pygame_surface.copy()
 
         # transparency
-        try:
-            # for text and images with transparent pixels
-            array = pygame.surfarray.pixels_alpha(self._secondary_pygame_surface)
-            array[:, :] = (array[:, :] * (self._transparency/100.)).astype(array.dtype) # modify surface pixels in-place
-            del array # I think pixels are written when array leaves memory, so delete is explicitly here
-        except Exception as e:
-            # this works for images without alpha pixels in them
-            self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
+        if self._transparency != 100 or force:
+            try:
+                # for text and images with transparent pixels
+                array = pygame.surfarray.pixels_alpha(self._secondary_pygame_surface)
+                array[:, :] = (array[:, :] * (self._transparency/100.)).astype(array.dtype) # modify surface pixels in-place
+                del array # I think pixels are written when array leaves memory, so delete it explicitly here
+            except Exception as e:
+                # this works for images without alpha pixels in them
+                self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
 
-        # scale and then rotate
-        ratio = self.size/100.
-        self._secondary_pygame_surface = pygame.transform.rotate(
-            pygame.transform.scale(
+        # scale
+        if (self.size != 100) or force:
+            ratio = self.size/100.
+            self._secondary_pygame_surface = pygame.transform.scale(
                 self._secondary_pygame_surface,
                 (round(self._secondary_pygame_surface.get_width() * ratio),    # width
                  round(self._secondary_pygame_surface.get_height() * ratio)))  # height
-        , self._degrees*-1)
+
+
+        # rotate
+        if (self.degrees != 0) or force:
+            self._secondary_pygame_surface = pygame.transform.rotate(self._secondary_pygame_surface, self._degrees*-1)
 
 
         self._should_recompute_secondary_surface = False

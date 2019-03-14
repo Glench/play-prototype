@@ -2,10 +2,10 @@ import play
 
 play.set_background_color('black')
 
-cat = play.new_sprite(image='cat.png', x=0, y=0, size=100, transparency=50)
-alien = play.new_sprite(image='alien.png', x=0, y=0, size=100, transparency=51)
+cat = play.new_sprite(image='cat.png', x=0, y=0, size=100, transparency=100)
+alien = play.new_sprite(image='alien.png', x=0, y=0, size=100, transparency=100)
 
-label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, color='blue', transparency=50)
+label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, color='blue', transparency=100)
 
 
 # TODO:
@@ -17,7 +17,6 @@ label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, c
 #   - play.new_rectangle(x=0, y=0, width=100, height=200, color='gray', border_color='red', border_width=1)
 #   - play.new_circle(x=0, y=0, radius=10, color='blue', border_width=1, border_color='red')
 #   - play.new_line(x=0, y=0, x_end=20, y_end=20, color='black')
-#   - redo transparency like pygame zero: https://pygame-zero.readthedocs.io/en/stable/ptext.html
 #   - performance test with lots of sprites
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
@@ -53,9 +52,9 @@ async def do():
 
     cat.point_towards(play.mouse)
 
-    fade(cat)
-    fade(alien)
-    fade(label)
+    # fade(cat)
+    # fade(alien)
+    # fade(label)
 
 @cat.when_clicked
 async def do():
