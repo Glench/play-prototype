@@ -2,8 +2,8 @@ import play
 
 play.set_background_color('black')
 
-cat = play.new_sprite(image='cat.png', x=0, y=0, size=100, transparency=100)
-alien = play.new_sprite(image='alien.png', x=0, y=0, size=100, transparency=100)
+cat = play.new_sprite(image='cat.png', x=0, y=0, size=100, transparency=50)
+alien = play.new_sprite(image='alien.png', x=0, y=0, size=100, transparency=51)
 
 label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, color='blue', transparency=50)
 
@@ -18,8 +18,10 @@ label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, c
 #   - play.new_circle(x=0, y=0, radius=10, color='blue', border_width=1, border_color='red')
 #   - play.new_line(x=0, y=0, x_end=20, y_end=20, color='black')
 #   - redo transparency like pygame zero: https://pygame-zero.readthedocs.io/en/stable/ptext.html
+#   - performance test with lots of sprites
 # boring, easy work:
 #   - add all color names (gray/grey, light blue, dark blue)
+#   - warn on sprite being set too small
 
 # @cat.when_clicked
 # @play.when_sprite_clicked(cat) TODO use `inspect` to allow using argument or not: inspect.getfullargspec(aMethod): https://stackoverflow.com/questions/218616/getting-method-parameter-names-in-python
@@ -33,13 +35,27 @@ label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=120, c
 # @sprite.when_click_released
 # play.mouse.when_click_released
 
+def fade(sprite):
+    if not hasattr(sprite, 'fade_out'):
+        sprite.fade_out = True
+
+    if sprite.fade_out:
+        sprite.transparency -= 1
+    else:
+        sprite.transparency += 1
+    if sprite.transparency == 0 or sprite.transparency == 100:
+        sprite.fade_out = not sprite.fade_out
+
+
 @play.repeat_forever
 async def do():
-    alien.x = play.mouse.x
-    alien.y = play.mouse.y
+    alien.go_to(play.mouse)
 
-    cat.transparency = 50
     cat.point_towards(play.mouse)
+
+    fade(cat)
+    fade(alien)
+    fade(label)
 
 @cat.when_clicked
 async def do():

@@ -1,5 +1,10 @@
 import sys
 import os
+import warnings
+def warning_format(message, category, filename, lineno, file=None, line=None):
+    return f'\n{category.__name__}... {message}\n'
+warnings.formatwarning = warning_format
+
 
 import pygame
 import OpenGL.GL as gl
@@ -14,11 +19,23 @@ from color import color_name_to_rgb
 pygame = pygame
 pygame.init()
 screen_width, screen_height = 800, 600
-# pygame_display = pygame.display.set_mode(size, pygame.DOUBLEBUF | pygame.OPENGL)
+# _pygame_display = pygame.display.set_mode((screen_width, screen_height), pygame.DOUBLEBUF | pygame.OPENGL)
 _pygame_display = pygame.display.set_mode((screen_width, screen_height), pygame.DOUBLEBUF)
 
+def _clamp(num, min_, max_):
+    if num < min_:
+        return min_
+    elif num > max_:
+        return max_
+    return num
 
 class Oops(Exception):
+    def __init__(self, message):
+        # for readability, always prepend exception messages in the library with two blank lines
+        message = '\n\n'+message
+        super(Oops, self).__init__(message)
+
+class Hmm(UserWarning):
     pass
 
 all_sprites = []
@@ -44,7 +61,7 @@ class sprite(object):
         self.y = y
         self._degrees = degrees
         self._size = size
-        self._transparency = transparency
+        self.transparency = transparency
 
         self._is_clicked = False
         self._is_hidden = False
@@ -58,30 +75,41 @@ class sprite(object):
 
     def _compute_primary_surface(self):
         self._primary_pygame_surface = pygame.image.load(os.path.join(self._image))
-        self._primary_pygame_surface.set_colorkey((255,255,255)) # set background to transparent
+        self._primary_pygame_surface.set_colorkey((255,255,255, 255)) # set background to transparent
+
         self._should_recompute_primary_surface = False
 
+        # always recompute secondary surface if the primary surface changes
         self._compute_secondary_surface(force=True)
 
     def _compute_secondary_surface(self, force=False):
         if not force and (self._size == 100 and self._degrees == 0 and self._transparency == 100):
-            self._secondary_pygame_surface = self._primary_pygame_surface
-            self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
-            self._secondary_pygame_surface = self._secondary_pygame_surface.convert_alpha()
+            self._secondary_pygame_surface = self._primary_pygame_surface.copy()
             self._should_recompute_secondary_surface = False
             return
 
-        ratio = self.size/100.
+        self._secondary_pygame_surface = self._primary_pygame_surface.copy()
+
+        # transparency
+        try:
+            # for text and images with transparent pixels
+            array = pygame.surfarray.pixels_alpha(self._secondary_pygame_surface)
+            array[:, :] = (array[:, :] * (self._transparency/100.)).astype(array.dtype) # modify surface pixels in-place
+            del array # I think pixels are written when array leaves memory, so delete is explicitly here
+        except Exception as e:
+            # this works for images without alpha pixels in them
+            self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
 
         # scale and then rotate
+        ratio = self.size/100.
         self._secondary_pygame_surface = pygame.transform.rotate(
             pygame.transform.scale(
-                self._primary_pygame_surface,
-                (round(self._primary_pygame_surface.get_width() * ratio),    # width
-                 round(self._primary_pygame_surface.get_height() * ratio)))  # height
+                self._secondary_pygame_surface,
+                (round(self._secondary_pygame_surface.get_width() * ratio),    # width
+                 round(self._secondary_pygame_surface.get_height() * ratio)))  # height
         , self._degrees*-1)
-        self._secondary_pygame_surface.set_alpha(round((self._transparency/100.) * 255))
-        self._secondary_pygame_surface = self._secondary_pygame_surface.convert_alpha()
+
+
         self._should_recompute_secondary_surface = False
 
     def is_clicked(self):
@@ -99,8 +127,16 @@ class sprite(object):
 
     @transparency.setter
     def transparency(self, alpha):
-        # alpha is between 0 and 100
-        self._transparency = alpha
+        if not isinstance(alpha, float) and not isinstance(alpha, int):
+            raise Oops(f"""Looks like you're trying to set {self._image}'s transparency to '{alpha}', which isn't a number.
+Try looking in your code for where you're setting transparency for {self._image} and change it a number.
+""")
+        if alpha > 100 or alpha < 0:
+            warnings.warn(f"""The transparency setting for {self._image} is being set to {alpha} and it should be between 0 and 100.
+You might want to look in your code where you're setting transparency for {self.image} and make sure it's between 0 and 100.  """, Hmm)
+
+
+        self._transparency = _clamp(alpha, 0, 100)
         self._should_recompute_secondary_surface = True
 
     @property 
@@ -505,7 +541,7 @@ def _game_loop():
         if sprite._should_recompute_secondary_surface:
             _loop.call_soon(sprite._compute_secondary_surface)
 
-        _pygame_display.blit(sprite._secondary_pygame_surface, (sprite._pygame_x(), sprite._pygame_y()))
+        _pygame_display.blit(sprite._secondary_pygame_surface, (sprite._pygame_x(), sprite._pygame_y()) )
 
     pygame.display.flip()
     _loop.call_soon(_game_loop)
@@ -578,7 +614,6 @@ cool stuff to add:
     @sprite.when_touched
 
     sprite.glide_to(other_sprite, seconds=1)
-    sprite.transparency = 0.5
     sprite.remove()
     dog.go_to(cat.bottom) # dog.go_to(cat.bottom+5)
     play sound / music
@@ -593,7 +628,6 @@ cool stuff to add:
         sprite.physics_off()
         sprite.is_physics_on()
         box2d is_fixed_rotation good for platformers
-    sprite.size = 2
     play.background_image('backgrounds/waterfall.png', fit_to_screen=False, x=0,y=0)
     play.random_position()
     play.random_color()
@@ -611,6 +645,7 @@ cool stuff to add:
 [ ] how to make a text input box simply?
 [ ] how to make pong?
 [ ] how to make paint app?
+[ ] how to make midi keyboard app?
 [ ] how to make click and drag boxes?
 [ ] how to make simple jumping box character with gravity?
 [ ] how to make more advanced platformer?
