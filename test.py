@@ -9,7 +9,6 @@ label = play.new_text(words='meow', x=0, y=0, font='Arial.ttf', font_size=50, co
 
 
 # TODO:
-#   - figure out terminology for rotate, pointing, degrees, turning, angle, etc
 #   - fix y axis
 #   - implement @when_key_released, @when_any_key_released
 #   - experiment with box2d or pymunk
@@ -86,47 +85,42 @@ def fade(sprite):
 
 
 
-# key_text = play.new_text(words='key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
-# @play.when_any_key_pressed
-# async def do(key):
-#     key_text.words = f'key pressed: {key}'
+key_text = play.new_text(words='key pressed: ', x=-200, y=-200, font='Arial.ttf', font_size=20, color='black')
+@play.when_any_key_pressed
+async def do(key):
+    key_text.words = f'key pressed: {key}'
 
-#     if key == 'up':
-#         cat.y -= 20
-#     if key == 'down':
-#         cat.y += 20
-#     if key == 'right':
-#         cat.x += 20
-#     if key == 'left':
-#         cat.x -= 20
+    if key == 'up':
+        cat.y -= 20
+    if key == 'down':
+        cat.y += 20
+    if key == 'right':
+        cat.x += 20
+    if key == 'left':
+        cat.x -= 20
 
 
-# @cat.when_clicked
-# async def do():
-#     label.words = 'cat clicked! :3'
+@cat.when_clicked
+async def do():
+    label.words = 'cat clicked! :3'
 
-#     if cat.size >= 200:
-#         for count in play.repeat(100):
-#             if count > 30:
-#                 label.words = 100-count
-#             cat.size -= 1
-#             label.size -= 1
-#             await play.animate()
-#     else:
-#         for count in play.repeat(100):
-#             if count > 30:
-#                 label.words = count
-#             cat.size += 1
-#             label.size += 1
-#             await play.animate()
+    if cat.size >= 200:
+        for count in play.repeat(100):
+            if count > 30:
+                label.words = 100-count
+            cat.size -= 1
+            label.size -= 1
+            await play.animate()
+    else:
+        for count in play.repeat(100):
+            if count > 30:
+                label.words = count
+            cat.size += 1
+            label.size += 1
+            await play.animate()
 
-#     await play.timer(seconds=.4)
-#     label.words = ''
-
-# @play.repeat_forever
-# async def do():
-#     label.degrees = cat.degrees
-#     label.words = cat.distance_to(play.mouse)
+    await play.timer(seconds=.4)
+    label.words = ''
 
 
 

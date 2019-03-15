@@ -51,15 +51,15 @@ def debug(on_or_off):
 def random_number(lowest=0, highest=100):
     return random.randint(lowest, highest)
 
-def new_sprite(image='cat.png', x=0, y=0, size=100, degrees=0, transparency=100):
-    return sprite(image=image, x=x, y=y, size=size, degrees=degrees, transparency=transparency)
+def new_sprite(image='cat.png', x=0, y=0, size=100, angle=0, transparency=100):
+    return sprite(image=image, x=x, y=y, size=size, angle=angle, transparency=transparency)
 
 class sprite(object):
-    def __init__(self, image='cat.png', x=0, y=0, size=100, degrees=0, transparency=100):
+    def __init__(self, image='cat.png', x=0, y=0, size=100, angle=0, transparency=100):
         self._image = image
         self.x = x
         self.y = y
-        self._degrees = degrees
+        self.angle = angle
         self._size = size
         self.transparency = transparency
 
@@ -107,8 +107,8 @@ class sprite(object):
 
 
         # rotate
-        if (self.degrees != 0) or force:
-            self._secondary_pygame_surface = pygame.transform.rotate(self._secondary_pygame_surface, self._degrees*-1)
+        if (self.angle != 0) or force:
+            self._secondary_pygame_surface = pygame.transform.rotate(self._secondary_pygame_surface, self._angle*-1)
 
 
         self._should_recompute_secondary_surface = False
@@ -120,7 +120,7 @@ class sprite(object):
         self.x += steps
 
     def turn(self, degrees=10):
-        self.degrees = self.degrees + degrees
+        self.angle = self.angle + degrees
 
     @property 
     def transparency(self):
@@ -150,12 +150,12 @@ You might want to look in your code where you're setting transparency for {self.
         self._should_recompute_primary_surface = True
 
     @property 
-    def degrees(self):
-        return self._degrees
+    def angle(self):
+        return self._angle
 
-    @degrees.setter
-    def degrees(self, _degrees):
-        self._degrees = _degrees
+    @angle.setter
+    def angle(self, _angle):
+        self._angle = _angle
         self._should_recompute_secondary_surface = True
 
     @property 
@@ -182,9 +182,9 @@ You might want to look in your code where you're setting transparency for {self.
     def point_towards(self, angle):
         try:
             x, y = angle.x, angle.y
-            self.degrees = math.degrees(math.atan2(y-self.y, x-self.x))
+            self.angle = math.degrees(math.atan2(y-self.y, x-self.x))
         except AttributeError:
-            self.degrees = angle
+            self.angle = angle
 
     def increase_size(self, percent=10):
         self._size += percent
@@ -277,11 +277,11 @@ class _mouse(object):
 
 mouse = _mouse()
 
-def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, color='black', degrees=0, transparency=100):
-    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color, degrees=degrees, transparency=transparency)
+def new_text(words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, color='black', angle=0, transparency=100):
+    return text(words=words, x=x, y=y, font=font, font_size=font_size, size=100, color=color, angle=angle, transparency=transparency)
 
 class text(sprite):
-    def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=100, color='black', degrees=0, transparency=100):
+    def __init__(self, words='hi :)', x=0, y=0, font='Arial.ttf', font_size=20, size=100, color='black', angle=0, transparency=100):
         self._words = words
         self.x = x
         self.y = y
@@ -289,8 +289,8 @@ class text(sprite):
         self._font_size = font_size
         self._color = color
         self._size = size
-        self._degrees = degrees
-        self._transparency = transparency
+        self.angle = angle
+        self.transparency = transparency
 
         self._is_clicked = False
         self._is_hidden = False
