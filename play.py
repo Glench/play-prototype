@@ -304,7 +304,6 @@ class text(sprite):
     def _compute_primary_surface(self):
         self._pygame_font = pygame.font.Font(self._font, self._font_size)
         self._primary_pygame_surface = self._pygame_font.render(self._words, True, color_name_to_rgb(self._color))
-        self._primary_pygame_surface.set_colorkey((255,255,255)) # set background to transparent
         self._should_recompute_primary_surface = False
 
         self._compute_secondary_surface(force=True)
@@ -549,7 +548,7 @@ def _game_loop():
     return True
 
 
-async def timer(seconds=1):
+async def timer(seconds=1.0):
     await asyncio.sleep(seconds)
     return True
 
@@ -635,9 +634,11 @@ cool stuff to add:
     sprite.flip(direction='left-right') sprite.flip(direction='up-down')
     sprite.flip(left_right=True, up_down=False)
 
+    maybe use pygame.text at some point: https://github.com/cosmologicon/pygame-text - make play.new_text_extra()
     text.wrapping = True
 
     add pygame images to cache for fast new sprite creation (reuse image.png, font)
+
 
 
 
@@ -665,7 +666,8 @@ principle:
 IDE ideas:
     - add helpful comment about any code appearing below play.start_program() not running. I made this mistake and it was confusing
     - if pasting in event code (e.g. @play.when_key_pressed async def do(key)), make the indent level all the way to the left
-    - if pasting in sprite code (e.g. is_hidden()), find the last defined sprite and call the method on that
-    - if pasting in awaitable code (e.g. await play.timer(seconds=1.0)), somehow make sure
+    - if pasting in sprite code (e.g. hide()), find the last defined sprite before the cursor and call the method on that.
+    - if command doesn't have visible effect (i.e. is_hidden()), print it or create a conditional (if sprite.is_hidden(): print("the sprite is hidden"))
+    - if pasting in awaitable code (e.g. await play.timer(seconds=1.0)), somehow make sure it's in an async function
     - if possible, always paste full working example code that will do something visible
 """
